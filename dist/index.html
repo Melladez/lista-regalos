@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Guarda y organiza tus ideas de regalo.">
+  <title>Mi lista de regalos</title>
+  <link rel="stylesheet" href="estilos.css">
+  <script src="regalos.js" defer></script>
+</head>
+<body>
+  <header><div class="wrap brand"><span aria-hidden="true">✦</span> Mi lista de regalos</div></header>
+  <main class="wrap">
+    <section class="hero" aria-labelledby="titulo">
+      <div>
+        <h1 id="titulo">Mi lista de<br><em>regalos</em></h1>
+        <p>Guarda esas cosas que te haría ilusión recibir.</p>
+      </div>
+      <div class="present" aria-hidden="true"><i></i><b></b><span>✧</span><small>✦</small></div>
+    </section>
+    <div class="workspace">
+      <section aria-labelledby="lista-titulo">
+        <div class="section-title"><h2 id="lista-titulo">Mis regalos</h2><span id="count"></span></div>
+        <div id="empty" class="empty">
+          <span aria-hidden="true">✧</span>
+          <h3>Tu lista empieza aquí</h3>
+          <p>Añade tu primer regalo con el formulario.</p>
+        </div>
+        <ul id="gifts"></ul>
+      </section>
+      <section class="panel" aria-labelledby="form-title">
+        <h2 id="form-title">Añadir regalo</h2>
+        <form id="gift-form">
+          <label for="name">Nombre</label>
+          <input id="name" name="name" maxlength="100" required placeholder="Ej. Una cámara instantánea">
+          <label for="link">Enlace</label>
+          <input id="link" name="link" type="url" maxlength="2048" required placeholder="https://…">
+          <label for="price">Precio (€)</label>
+          <input id="price" name="price" type="text" inputmode="decimal" maxlength="12" required placeholder="0,00">
+          <label for="description">Descripción <small>(opcional)</small></label>
+          <textarea id="description" name="description" maxlength="300" rows="3" placeholder="Color, talla o algún detalle…"></textarea>
+          <button class="primary" id="save" type="submit">＋ Añadir regalo</button>
+          <button id="cancel" type="button" hidden>Cancelar edición</button>
+        </form>
+        <p class="storage">La lista se guarda en este navegador.</p>
+      </section>
+    </div>
+    <p id="status" role="status"></p>
+  </main>
+</body>
+</html>
