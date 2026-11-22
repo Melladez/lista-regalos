@@ -188,7 +188,7 @@ function animateGiftPositions(previousPositions) {
 
 function orderControls(item, gift, index, count) {
   const controls = element('div', '', 'order-controls');
-  for (const [label, symbol, step] of [['Subir', '↑', -1], ['Bajar', '↓', 1]]) {
+  for (const [label, symbol, step] of [['Mover a la izquierda', '←', -1], ['Mover a la derecha', '→', 1]]) {
     const button = action(symbol, () => moveGift(gift.id, (gifts, from) => from + step, String(step)));
     button.className = 'order-step';
     button.dataset.step = String(step);
@@ -249,6 +249,45 @@ function orderControls(item, gift, index, count) {
   return controls;
 }
 
+function favoriteControl(item, gift) {
+  const star = element('span', '', 'favorite-star');
+  star.setAttribute('aria-hidden', 'true');
+  const button = action('', () => {
+    try {
+      const gifts = readGifts();
+      const entry = gifts.find(other => other.id === gift.id);
+      if (!entry) return;
+      entry.favorite = !entry.favorite;
+      localStorage.setItem(storageKey, JSON.stringify(gifts));
+      update(entry.favorite);
+      if (entry.favorite && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        star.animate([
+          { transform: 'rotate(0deg) scale(1)' },
+          { transform: 'rotate(-25deg) scale(1.2)' },
+          { transform: 'rotate(21deg) scale(1.2)' },
+          { transform: 'rotate(-12deg) scale(1.08)' },
+          { transform: 'rotate(0deg) scale(1)' }
+        ], { duration: 420, easing: 'ease-out' });
+      }
+    } catch {
+      status.textContent = 'No se pudo guardar el favorito en este navegador.';
+    }
+  });
+  button.className = 'favorite-button';
+  button.setAttribute('aria-label', `Favorito: ${gift.name}`);
+  button.append(star);
+
+  function update(favorite) {
+    item.classList.toggle('is-favorite', favorite);
+    button.setAttribute('aria-pressed', String(favorite));
+    button.title = favorite ? 'Quitar de favoritos' : 'Marcar como favorito';
+    star.textContent = favorite ? '★' : '☆';
+  }
+
+  update(gift.favorite === true);
+  return button;
+}
+
 function render(gifts) {
   document.querySelector('#count').textContent = gifts.length === 1 ? '1 regalo' : `${gifts.length} regalos`;
   document.querySelector('#empty').hidden = gifts.length > 0;
@@ -278,7 +317,7 @@ function render(gifts) {
     product.rel = 'noopener noreferrer';
     actions.append(product, action('Editar', () => editGift(gift)), action('Eliminar', () => removeGift(gift)));
     if (!showOrderControls) footer.append(actions);
-    footer.append(element('span', euros.format(gift.cents / 100), 'price'));
+    footer.append(element('span', euros.format(gift.cents / 100), 'price'), favoriteControl(item, gift));
     item.append(main, footer);
     if (showOrderControls) item.append(orderControls(item, gift, index, gifts.length));
     return item;
@@ -298,7 +337,7 @@ orderToggle.addEventListener('click', () => {
   bannerStatus.textContent = '';
   updateBanner(bannerDescription.textContent);
   refresh();
-  status.textContent = ordering && list.children.length > 1 ? 'Usa los botones para subir o bajar regalos, o arrastra el tirador.' : '';
+  status.textContent = ordering && list.children.length > 1 ? 'Usa las flechas para mover los regalos a la izquierda o a la derecha, o arrastra el tirador.' : '';
 });
 
 bannerForm.addEventListener('submit', event => {
@@ -429,7 +468,7 @@ form.addEventListener('submit', event => {
       status.textContent = 'El regalo ya se ha eliminado.';
       return;
     }
-    persist(editing ? gifts.map(item => item.id === editing ? gift : item) : [gift, ...gifts]);
+    persist(editing ? gifts.map(item => item.id === editing ? { ...item, ...gift } : item) : [gift, ...gifts]);
     status.textContent = editing ? 'Cambios guardados.' : 'Regalo añadido.';
     closeForm();
   } catch {
