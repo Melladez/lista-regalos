@@ -79,3 +79,8 @@ input,textarea{border-color:#cad8c9;background:#fafbf8}
 #form-toggle[aria-expanded="true"] .toggle-icon::before{content:"−"}
 .panel form{margin:0;padding:16px 20px 0}
 .panel .storage{padding:0 20px 18px}
+.image-options{min-width:0;margin:8px 0 0;padding:12px;border:1px solid #cad8c9;border-radius:10px;display:grid;gap:8px}
+.image-options legend{font-weight:700}
+#image-status{font-size:.875rem;color:#526357}
+#image-status:empty{display:none}
+#image-preview,.gift-image{display:block;width:100%;max-height:220px;object-fit:contain;background:#f7f8f3;border-radius:10px}
