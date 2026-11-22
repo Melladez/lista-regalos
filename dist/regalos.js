@@ -125,6 +125,94 @@ function readGifts() {
   return gifts;
 }
 
+const importFile = document.querySelector('#import-file');
+const transferStatus = document.querySelector('#transfer-status');
+
+document.querySelector('#export-list').addEventListener('click', () => {
+  try {
+    const backup = {
+      version: 1,
+      gifts: readGifts(),
+      banner: localStorage.getItem(bannerKey)
+    };
+    const url = URL.createObjectURL(new Blob([JSON.stringify(backup)], { type: 'application/json' }));
+    const download = document.createElement('a');
+    download.href = url;
+    download.download = 'mi-lista-de-regalos.json';
+    download.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    transferStatus.textContent = 'Copia preparada. Guarda el archivo para importarlo en la otra página.';
+  } catch {
+    transferStatus.textContent = 'No se pudo exportar la lista.';
+  }
+});
+
+function parseBackup(text) {
+  const backup = JSON.parse(text);
+  if (backup?.version !== 1 || !Array.isArray(backup.gifts) ||
+      !(backup.banner === null || typeof backup.banner === 'string' && backup.banner.length <= 180)) {
+    throw new Error('Copia inválida');
+  }
+  const ids = new Set();
+  const gifts = backup.gifts.map(gift => {
+    if (!gift || typeof gift.id !== 'string' || !gift.id || ids.has(gift.id) ||
+        typeof gift.name !== 'string' || !gift.name.trim() || gift.name.length > 100 ||
+        typeof gift.description !== 'string' || gift.description.length > 300 ||
+        typeof gift.link !== 'string' || !Number.isSafeInteger(gift.cents) || gift.cents < 0) {
+      throw new Error('Regalo inválido');
+    }
+    ids.add(gift.id);
+    const image = gift.image ?? '';
+    if (typeof image !== 'string') throw new Error('Imagen inválida');
+    return {
+      id: gift.id,
+      name: gift.name,
+      description: gift.description,
+      link: webUrl(gift.link),
+      cents: gift.cents,
+      image: !image || /^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+=*$/.test(image) ? image : webUrl(image),
+      favorite: gift.favorite === true
+    };
+  });
+  return { gifts, banner: backup.banner };
+}
+
+document.querySelector('#import-list').addEventListener('click', () => importFile.click());
+importFile.addEventListener('change', async () => {
+  const file = importFile.files[0];
+  if (!file) return;
+  importFile.value = '';
+  let backup;
+  try {
+    if (file.size > 12 * 1024 * 1024) throw new Error('Copia demasiado grande');
+    backup = parseBackup(await file.text());
+  } catch {
+    transferStatus.textContent = 'El archivo seleccionado no es una copia válida de la lista.';
+    return;
+  }
+  try {
+    const current = readGifts();
+    const currentIds = new Set(current.map(gift => gift.id));
+    const additions = backup.gifts.filter(gift => !currentIds.has(gift.id));
+    const restoreBanner = backup.banner !== null && localStorage.getItem(bannerKey) === null;
+    if (restoreBanner) localStorage.setItem(bannerKey, backup.banner);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify([...current, ...additions]));
+    } catch (error) {
+      if (restoreBanner) localStorage.removeItem(bannerKey);
+      throw error;
+    }
+    if (restoreBanner) {
+      updateBanner(backup.banner);
+      bannerText.value = backup.banner;
+    }
+    refresh();
+    transferStatus.textContent = additions.length === 1 ? 'Se ha importado 1 regalo.' : `Se han importado ${additions.length} regalos.`;
+  } catch {
+    transferStatus.textContent = 'No se pudo guardar la copia. Comprueba el espacio disponible en este navegador.';
+  }
+});
+
 function webUrl(value) {
   const url = new URL(value);
   if (!['https:', 'http:'].includes(url.protocol)) throw new Error('Enlace no válido');

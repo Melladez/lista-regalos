@@ -152,6 +152,10 @@ h1 em { color: var(--gold); }
   border-bottom: 1px solid var(--line);
 }
 .section-title { display: flex; align-items: center; gap: 10px; }
+.transfer { margin-bottom: 16px; font-size: .875rem; }
+.transfer summary { width: fit-content; color: var(--pine); font-weight: 700; cursor: pointer; }
+.transfer-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+#transfer-status:not(:empty) { margin-top: 8px; color: var(--muted); }
 h2 { font: 400 clamp(1.45rem, 3vw, 2.25rem)/1.1 var(--serif); }
 #count { padding: 4px 9px; border-radius: 99px; background: #eee5d5; color: #59483b; font-size: .875rem; }
 .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 0px 0px; align-items: start; transition: grid-template-columns 280ms ease; }
