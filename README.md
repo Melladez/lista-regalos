@@ -11,7 +11,7 @@ npm ci
 npm run build
 ```
 
-La compilación genera `public/` con los archivos de la interfaz. El despliegue no requiere variables de entorno.
+La interfaz se edita en `src/`. La compilación de Vercel genera `public/`. Para Sites, `node build.mjs` genera `dist/server/index.js`. Ambas salidas se regeneran a partir del código versionado. El despliegue no requiere variables de entorno.
 
 ## Publicar en Vercel
 
