@@ -47,3 +47,32 @@ button:hover,.product:hover{filter:brightness(.95)}
 #status{min-height:1.5em;margin:14px 0 24px}
 @media(max-width:700px){.workspace{grid-template-columns:1fr}.panel{grid-row:1}}
 @media(max-width:430px){.hero{gap:8px}.present{width:85px}.present b::before,.present b::after{border-width:4px}.present span,.present small{font-size:1rem}.hero p{margin-top:14px}}
+
+:root{color:#222e28;background:#f7f8f3}
+header{border-color:#dce4d8}
+.brand span{background:#245743}
+.hero{color:#fff9e9;border-color:#245743;background:radial-gradient(ellipse at 85% 28%,#427558,transparent 58%),linear-gradient(120deg,#153e31,#245743)}
+h1 em{color:#f7d68d}
+.hero p{color:#eef3e8}
+.present{background:#ffffff19}
+.present i{background:linear-gradient(90deg,#ad3345 41%,#f9d895 41%,#f9d895 59%,#ad3345 59%);box-shadow:0 14px 24px #142a2370}
+.present b{background:linear-gradient(90deg,#cb4a59 42%,#ffe7b4 42%,#ffe7b4 58%,#cb4a59 58%)}
+.present b::before,.present b::after{border-color:#f9d895}
+.present span,.present small{color:#f9d895}
+#count,.empty span,button,.product{background:#e6eee5;color:#245743}
+.empty,.panel,.gift{border-color:#d6e1d4}
+.empty p,.storage,label small,.description{color:#526357}
+input,textarea{border-color:#cad8c9;background:#fafbf8}
+.price{color:#245743}
+.primary{background:#923044;color:#fff}
+:focus-visible{outline-color:#a76725}
+.panel{padding:0;overflow:hidden}
+.panel summary{display:flex;align-items:center;gap:10px;background:#245743;color:#fff;padding:15px 20px;cursor:pointer;font-weight:750;list-style:none}
+.panel summary::-webkit-details-marker{display:none}
+.panel summary:hover{background:#1b4837}
+.panel summary:focus-visible{outline-offset:-4px;outline-color:#f7d68d}
+.toggle-icon{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#ffffff24}
+.toggle-icon::before{content:"+"}
+.panel[open] .toggle-icon::before{content:"−"}
+.panel form{margin:0;padding:16px 20px 0}
+.panel .storage{padding:0 20px 18px}

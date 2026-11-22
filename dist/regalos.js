@@ -3,6 +3,8 @@ const form = document.querySelector('#gift-form');
 const { name: nameField, link, price, description } = form.elements;
 const list = document.querySelector('#gifts');
 const status = document.querySelector('#status');
+const panel = document.querySelector('#gift-panel');
+const toggle = document.querySelector('#form-toggle');
 const title = document.querySelector('#form-title');
 const save = document.querySelector('#save');
 const cancel = document.querySelector('#cancel');
@@ -60,7 +62,7 @@ function resetForm() {
   form.reset();
   for (const field of [nameField, link, price]) field.setCustomValidity('');
   title.textContent = 'Añadir regalo';
-  save.textContent = '＋ Añadir regalo';
+  save.textContent = 'Guardar regalo';
   cancel.hidden = true;
 }
 
@@ -74,7 +76,14 @@ function editGift(gift) {
   title.textContent = 'Editar regalo';
   save.textContent = 'Guardar cambios';
   cancel.hidden = false;
+  panel.open = true;
   nameField.focus();
+}
+
+function closeForm() {
+  resetForm();
+  panel.open = false;
+  toggle.focus();
 }
 
 function persist(gifts) {
@@ -86,9 +95,9 @@ function removeGift(gift) {
   if (!window.confirm(`¿Eliminar «${gift.name}» de tu lista?`)) return;
   try {
     persist(readGifts().filter(item => item.id !== gift.id));
-    if (editing === gift.id) resetForm();
+    if (editing === gift.id) closeForm();
     status.textContent = 'Regalo eliminado.';
-    nameField.focus();
+    toggle.focus();
   } catch {
     status.textContent = 'No se pudo eliminar el regalo.';
   }
@@ -98,10 +107,7 @@ for (const field of [nameField, link, price]) {
   field.addEventListener('input', () => field.setCustomValidity(''));
 }
 
-cancel.addEventListener('click', () => {
-  resetForm();
-  nameField.focus();
-});
+cancel.addEventListener('click', closeForm);
 
 form.addEventListener('submit', event => {
   event.preventDefault();
@@ -136,14 +142,13 @@ form.addEventListener('submit', event => {
   try {
     const gifts = readGifts();
     if (editing && !gifts.some(item => item.id === editing)) {
-      resetForm();
+      closeForm();
       status.textContent = 'El regalo ya se ha eliminado.';
       return;
     }
     persist(editing ? gifts.map(item => item.id === editing ? gift : item) : [gift, ...gifts]);
     status.textContent = editing ? 'Cambios guardados.' : 'Regalo añadido.';
-    resetForm();
-    nameField.focus();
+    closeForm();
   } catch {
     status.textContent = 'No se pudo guardar el regalo en este navegador.';
   }
