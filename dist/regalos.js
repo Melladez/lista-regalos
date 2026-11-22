@@ -141,26 +141,27 @@ function render(gifts) {
   document.querySelector('#empty').hidden = gifts.length > 0;
   list.replaceChildren(...gifts.map(gift => {
     const item = element('li', '', 'gift');
-    const heading = element('div', '', 'gift-title');
-    heading.append(element('h3', gift.name), element('span', euros.format(gift.cents / 100), 'price'));
-    item.append(heading);
     if (gift.image) {
       const image = element('img', '', 'gift-image');
       image.alt = '';
       image.loading = 'lazy';
       image.referrerPolicy = 'no-referrer';
-      image.addEventListener('error', () => { image.hidden = true; });
+      image.addEventListener('error', () => { image.remove(); });
       image.src = gift.image;
       item.append(image);
     }
-    if (gift.description) item.append(element('p', gift.description, 'description'));
+    const details = element('div', '', 'gift-details');
+    details.append(element('h3', gift.name));
+    if (gift.description) details.append(element('p', gift.description, 'description'));
+    details.append(element('span', euros.format(gift.cents / 100), 'price'));
     const actions = element('div', '', 'actions');
     const product = element('a', 'Ver producto', 'product');
     product.href = webUrl(gift.link);
     product.target = '_blank';
     product.rel = 'noopener noreferrer';
     actions.append(product, action('Editar', () => editGift(gift)), action('Eliminar', () => removeGift(gift)));
-    item.append(actions);
+    details.append(actions);
+    item.append(details);
     return item;
   }));
 }
