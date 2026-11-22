@@ -3,9 +3,6 @@
 body{margin:0}
 [hidden]{display:none!important}
 .wrap{width:min(1080px,calc(100% - 40px));margin:auto}
-header{border-bottom:1px solid #e8e1f3;background:#fff}
-.brand{display:flex;align-items:center;gap:10px;min-height:68px;font-weight:750}
-.brand span{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:#663cbd;color:white}
 .hero{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:32px;margin:32px 0;padding:clamp(26px,6vw,66px);border:1px solid #e2d5fb;border-radius:28px;background:radial-gradient(ellipse at 85% 30%,#f5e1ff,transparent 50%),linear-gradient(120deg,#eee6ff,#e5dcff)}
 h1,h2,h3,p{margin:0}
 h1{font-family:Georgia,serif;font-size:clamp(3.05rem,8vw,6rem);line-height:.94;letter-spacing:-.065em}
@@ -20,8 +17,13 @@ h1 em{color:#663cbd}
 .present span,.present small{position:absolute;color:#663cbd;font-size:2rem}
 .present span{right:6%;top:10%}
 .present small{left:6%;bottom:12%}
-.workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,370px);gap:28px;align-items:start}
-.section-title{display:flex;align-items:center;gap:12px;margin:8px 0 16px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.section-title{display:flex;align-items:center;gap:12px}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) 0px 0px;align-items:start;transition:grid-template-columns 280ms ease}
+.workspace.form-open{grid-template-columns:minmax(0,1fr) 28px min(37%,370px)}
+.form-reveal{grid-column:3;display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows 280ms ease,opacity 220ms ease}
+.form-open .form-reveal{grid-template-rows:1fr;opacity:1}
+.form-clip{overflow:hidden;min-height:0}
 h2{font-size:1.45rem}
 #count{background:#eee6ff;color:#563191;border-radius:20px;padding:4px 10px;font-size:.875rem}
 .empty{display:grid;justify-items:center;gap:8px;text-align:center;border:1px dashed #cfc0e8;border-radius:22px;padding:44px 16px;background:#fff}
@@ -45,12 +47,15 @@ button:hover,.product:hover{filter:brightness(.95)}
 .price{color:#563191;font-weight:750;white-space:nowrap}
 .description{white-space:pre-wrap}
 #status{min-height:1.5em;margin:14px 0 24px}
-@media(max-width:700px){.workspace{grid-template-columns:1fr}.panel{grid-row:1}}
+@media(max-width:760px){
+  .workspace,.workspace.form-open{grid-template-columns:minmax(0,1fr)}
+  .form-reveal{grid-area:1/1}
+  .form-clip .panel{margin-bottom:16px}
+}
+@media(prefers-reduced-motion:reduce){.workspace,.form-reveal{transition:none}}
 @media(max-width:430px){.hero{gap:8px}.present{width:85px}.present b::before,.present b::after{border-width:4px}.present span,.present small{font-size:1rem}.hero p{margin-top:14px}}
 
 :root{color:#222e28;background:#f7f8f3}
-header{border-color:#dce4d8}
-.brand span{background:#245743}
 .hero{color:#fff9e9;border-color:#245743;background:radial-gradient(ellipse at 85% 28%,#427558,transparent 58%),linear-gradient(120deg,#153e31,#245743)}
 h1 em{color:#f7d68d}
 .hero p{color:#eef3e8}
@@ -67,12 +72,10 @@ input,textarea{border-color:#cad8c9;background:#fafbf8}
 .primary{background:#923044;color:#fff}
 :focus-visible{outline-color:#a76725}
 .panel{padding:0;overflow:hidden}
-.panel summary{display:flex;align-items:center;gap:10px;background:#245743;color:#fff;padding:15px 20px;cursor:pointer;font-weight:750;list-style:none}
-.panel summary::-webkit-details-marker{display:none}
-.panel summary:hover{background:#1b4837}
-.panel summary:focus-visible{outline-offset:-4px;outline-color:#f7d68d}
+#form-toggle{display:flex;align-items:center;gap:10px;background:#245743;color:#fff;padding:12px 16px}
+#form-toggle:hover{background:#1b4837}
 .toggle-icon{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#ffffff24}
 .toggle-icon::before{content:"+"}
-.panel[open] .toggle-icon::before{content:"−"}
+#form-toggle[aria-expanded="true"] .toggle-icon::before{content:"−"}
 .panel form{margin:0;padding:16px 20px 0}
 .panel .storage{padding:0 20px 18px}

@@ -9,7 +9,6 @@
   <script src="regalos.js" defer></script>
 </head>
 <body>
-  <header><div class="wrap brand"><span aria-hidden="true">✦</span> Mi lista de regalos</div></header>
   <main class="wrap">
     <section class="hero" aria-labelledby="titulo">
       <div>
@@ -18,9 +17,12 @@
       </div>
       <div class="present" aria-hidden="true"><i></i><b></b><span>✧</span><small>✦</small></div>
     </section>
+    <div class="toolbar">
+      <div class="section-title"><h2 id="lista-titulo">Mis regalos</h2><span id="count"></span></div>
+      <button type="button" id="form-toggle" aria-expanded="false" aria-controls="gift-panel"><span aria-hidden="true" class="toggle-icon"></span><span id="form-title">Añadir regalo</span></button>
+    </div>
     <div class="workspace">
       <section aria-labelledby="lista-titulo">
-        <div class="section-title"><h2 id="lista-titulo">Mis regalos</h2><span id="count"></span></div>
         <div id="empty" class="empty">
           <span aria-hidden="true">✧</span>
           <h3>Tu lista empieza aquí</h3>
@@ -28,22 +30,25 @@
         </div>
         <ul id="gifts"></ul>
       </section>
-      <details class="panel" id="gift-panel">
-        <summary id="form-toggle"><span aria-hidden="true" class="toggle-icon"></span><span id="form-title">Añadir regalo</span></summary>
-        <form id="gift-form">
-          <label for="name">Nombre</label>
-          <input id="name" name="name" maxlength="100" required placeholder="Ej. Una cámara instantánea">
-          <label for="link">Enlace</label>
-          <input id="link" name="link" type="url" maxlength="2048" required placeholder="https://…">
-          <label for="price">Precio (€)</label>
-          <input id="price" name="price" type="text" inputmode="decimal" maxlength="12" required placeholder="0,00">
-          <label for="description">Descripción <small>(opcional)</small></label>
-          <textarea id="description" name="description" maxlength="300" rows="3" placeholder="Color, talla o algún detalle…"></textarea>
-          <button class="primary" id="save" type="submit">Guardar regalo</button>
-          <button id="cancel" type="button" hidden>Cancelar edición</button>
-        </form>
-        <p class="storage">La lista se guarda en este navegador.</p>
-      </details>
+      <div class="form-reveal" id="gift-panel" inert>
+        <div class="form-clip">
+          <div class="panel">
+            <form id="gift-form">
+              <label for="name">Nombre</label>
+              <input id="name" name="name" maxlength="100" required placeholder="Ej. Una cámara instantánea">
+              <label for="link">Enlace</label>
+              <input id="link" name="link" type="url" maxlength="2048" required placeholder="https://…">
+              <label for="price">Precio (€)</label>
+              <input id="price" name="price" type="text" inputmode="decimal" maxlength="12" required placeholder="0,00">
+              <label for="description">Descripción <small>(opcional)</small></label>
+              <textarea id="description" name="description" maxlength="300" rows="3" placeholder="Color, talla o algún detalle…"></textarea>
+              <button class="primary" id="save" type="submit">Guardar regalo</button>
+              <button id="cancel" type="button" hidden>Cancelar edición</button>
+            </form>
+            <p class="storage">La lista se guarda en este navegador.</p>
+          </div>
+        </div>
+      </div>
     </div>
     <p id="status" role="status"></p>
   </main>

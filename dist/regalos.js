@@ -76,14 +76,20 @@ function editGift(gift) {
   title.textContent = 'Editar regalo';
   save.textContent = 'Guardar cambios';
   cancel.hidden = false;
-  panel.open = true;
+  setFormOpen(true);
   nameField.focus();
+}
+
+function setFormOpen(open) {
+  toggle.setAttribute('aria-expanded', String(open));
+  panel.inert = !open;
+  panel.parentElement.classList.toggle('form-open', open);
 }
 
 function closeForm() {
   resetForm();
-  panel.open = false;
   toggle.focus();
+  setFormOpen(false);
 }
 
 function persist(gifts) {
@@ -108,6 +114,11 @@ for (const field of [nameField, link, price]) {
 }
 
 cancel.addEventListener('click', closeForm);
+toggle.addEventListener('click', () => {
+  const open = toggle.getAttribute('aria-expanded') === 'false';
+  setFormOpen(open);
+  if (open) nameField.focus({ preventScroll: true });
+});
 
 form.addEventListener('submit', event => {
   event.preventDefault();
