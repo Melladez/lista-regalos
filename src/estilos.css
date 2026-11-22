@@ -201,7 +201,12 @@ h1 em { color: var(--gold); }
   background: var(--paper);
   box-shadow: 0 8px 20px #4e2b1420;
 }
-.transfer-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.transfer-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.transfer-actions button { padding-inline: 8px; font-size: .875rem; white-space: nowrap; }
 .transfer[open] .transfer-menu { animation: transfer-open 220ms ease-out both; }
 @keyframes transfer-open {
   from { opacity: 0; transform: translateY(-8px) scale(.98); }
