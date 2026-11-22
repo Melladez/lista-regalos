@@ -146,9 +146,13 @@ function moveGift(id, destination, focusControl) {
     if (from < 0) return;
     const to = destination(gifts, from);
     if (to < 0 || to >= gifts.length || to === from) return;
+    const previousTops = focusControl && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? new Map(Array.from(list.children, card => [card.dataset.giftId, card.getBoundingClientRect().top]))
+      : null;
     const [gift] = gifts.splice(from, 1);
     gifts.splice(to, 0, gift);
     persist(gifts);
+    if (previousTops) animateGiftPositions(previousTops);
     status.textContent = `${gift.name} ahora está en la posición ${to + 1} de ${gifts.length}.`;
     if (focusControl) {
       const controls = list.children[to].querySelectorAll('.order-step:not(:disabled)');
@@ -157,6 +161,21 @@ function moveGift(id, destination, focusControl) {
     }
   } catch {
     status.textContent = 'No se pudo guardar el orden en este navegador.';
+  }
+}
+
+function animateGiftPositions(previousTops) {
+  const movements = Array.from(list.children, card => ({
+    card,
+    offset: previousTops.get(card.dataset.giftId) - card.getBoundingClientRect().top
+  }));
+  for (const { card, offset } of movements) {
+    if (offset) {
+      card.animate(
+        [{ transform: `translateY(${offset}px)` }, { transform: 'translateY(0)' }],
+        { duration: 260, easing: 'ease-out' }
+      );
+    }
   }
 }
 
@@ -228,6 +247,7 @@ function render(gifts) {
   orderToggle.setAttribute('aria-pressed', String(ordering));
   list.replaceChildren(...gifts.map((gift, index) => {
     const item = element('li', '', 'gift');
+    item.dataset.giftId = gift.id;
     if (gift.image) {
       const image = element('img', '', 'gift-image');
       image.alt = '';
