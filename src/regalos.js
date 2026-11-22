@@ -403,8 +403,11 @@ function render(gifts) {
     product.href = webUrl(gift.link);
     product.target = '_blank';
     product.rel = 'noopener noreferrer';
-    actions.append(product, action('Editar', () => editGift(gift)), action('Eliminar', () => removeGift(gift)));
-    if (!showOrderControls) footer.append(actions);
+    actions.append(product);
+    if (ordering) {
+      actions.append(action('Editar', () => editGift(gift)), action('Eliminar', () => removeGift(gift)));
+    }
+    footer.append(actions);
     footer.append(element('span', euros.format(gift.cents / 100), 'price'), favoriteControl(item, gift));
     item.append(main, footer);
     if (showOrderControls) item.append(orderControls(item, gift, index, gifts.length));
