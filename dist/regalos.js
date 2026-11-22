@@ -146,13 +146,13 @@ function moveGift(id, destination, focusControl) {
     if (from < 0) return;
     const to = destination(gifts, from);
     if (to < 0 || to >= gifts.length || to === from) return;
-    const previousTops = focusControl && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      ? new Map(Array.from(list.children, card => [card.dataset.giftId, card.getBoundingClientRect().top]))
+    const previousPositions = focusControl && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? new Map(Array.from(list.children, card => [card.dataset.giftId, card.getBoundingClientRect()]))
       : null;
     const [gift] = gifts.splice(from, 1);
     gifts.splice(to, 0, gift);
     persist(gifts);
-    if (previousTops) animateGiftPositions(previousTops);
+    if (previousPositions) animateGiftPositions(previousPositions);
     status.textContent = `${gift.name} ahora está en la posición ${to + 1} de ${gifts.length}.`;
     if (focusControl) {
       const controls = list.children[to].querySelectorAll('.order-step:not(:disabled)');
@@ -164,15 +164,16 @@ function moveGift(id, destination, focusControl) {
   }
 }
 
-function animateGiftPositions(previousTops) {
-  const movements = Array.from(list.children, card => ({
-    card,
-    offset: previousTops.get(card.dataset.giftId) - card.getBoundingClientRect().top
-  }));
-  for (const { card, offset } of movements) {
-    if (offset) {
+function animateGiftPositions(previousPositions) {
+  const movements = Array.from(list.children, card => {
+    const previous = previousPositions.get(card.dataset.giftId);
+    const current = card.getBoundingClientRect();
+    return { card, x: previous.left - current.left, y: previous.top - current.top };
+  });
+  for (const { card, x, y } of movements) {
+    if (x || y) {
       card.animate(
-        [{ transform: `translateY(${offset}px)` }, { transform: 'translateY(0)' }],
+        [{ transform: `translate(${x}px, ${y}px)` }, { transform: 'translate(0, 0)' }],
         { duration: 260, easing: 'ease-out' }
       );
     }
@@ -207,9 +208,11 @@ function orderControls(item, gift, index, count) {
     item.classList.remove('dragging');
     list.querySelector('[data-drop]')?.removeAttribute('data-drop');
   });
-  const dropAfter = event => {
+  const dropEdge = event => {
     const bounds = item.getBoundingClientRect();
-    return event.clientY >= bounds.top + bounds.height / 2;
+    const columns = getComputedStyle(list).gridTemplateColumns.trim().split(/\s+/);
+    if (columns.length > 1) return event.clientX >= bounds.left + bounds.width / 2 ? 'right' : 'left';
+    return event.clientY >= bounds.top + bounds.height / 2 ? 'after' : 'before';
   };
   item.addEventListener('dragover', event => {
     if (draggedGiftId === null || draggedGiftId === gift.id) return;
@@ -217,7 +220,7 @@ function orderControls(item, gift, index, count) {
     event.dataTransfer.dropEffect = 'move';
     const previous = list.querySelector('[data-drop]');
     if (previous !== item) previous?.removeAttribute('data-drop');
-    item.dataset.drop = dropAfter(event) ? 'after' : 'before';
+    item.dataset.drop = dropEdge(event);
   });
   item.addEventListener('dragleave', event => {
     if (!item.contains(event.relatedTarget)) item.removeAttribute('data-drop');
@@ -226,7 +229,8 @@ function orderControls(item, gift, index, count) {
     if (draggedGiftId === null || draggedGiftId === gift.id) return;
     event.preventDefault();
     const id = draggedGiftId;
-    const after = dropAfter(event);
+    const edge = dropEdge(event);
+    const after = edge === 'right' || edge === 'after';
     draggedGiftId = null;
     item.removeAttribute('data-drop');
     list.querySelector('.dragging')?.classList.remove('dragging');
@@ -248,6 +252,7 @@ function render(gifts) {
   list.replaceChildren(...gifts.map((gift, index) => {
     const item = element('li', '', 'gift');
     item.dataset.giftId = gift.id;
+    const main = element('div', '', 'gift-main');
     if (gift.image) {
       const image = element('img', '', 'gift-image');
       image.alt = '';
@@ -255,20 +260,22 @@ function render(gifts) {
       image.referrerPolicy = 'no-referrer';
       image.addEventListener('error', () => { image.remove(); });
       image.src = gift.image;
-      item.append(image);
+      main.append(image);
     }
     const details = element('div', '', 'gift-details');
     details.append(element('h3', gift.name));
     if (gift.description) details.append(element('p', gift.description, 'description'));
-    details.append(element('span', euros.format(gift.cents / 100), 'price'));
+    main.append(details);
+    const footer = element('div', '', 'gift-footer');
     const actions = element('div', '', 'actions');
     const product = element('a', 'Ver producto', 'product');
     product.href = webUrl(gift.link);
     product.target = '_blank';
     product.rel = 'noopener noreferrer';
     actions.append(product, action('Editar', () => editGift(gift)), action('Eliminar', () => removeGift(gift)));
-    if (!ordering) details.append(actions);
-    item.append(details);
+    if (!ordering) footer.append(actions);
+    footer.append(element('span', euros.format(gift.cents / 100), 'price'));
+    item.append(main, footer);
     if (ordering) item.append(orderControls(item, gift, index, gifts.length));
     return item;
   }));

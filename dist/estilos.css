@@ -20,7 +20,7 @@ body {
 }
 [hidden] { display: none !important; }
 h1, h2, h3, p { margin: 0; }
-.wrap { width: min(1080px, calc(100% - 48px)); margin: auto; }
+.wrap { width: min(1560px, calc(100% - 64px)); margin: auto; }
 
 .hero {
   position: relative;
@@ -65,7 +65,7 @@ h1 {
 }
 h1 em { color: var(--gold); }
 .hero p { max-width: 34ch; margin-top: 22px; color: #fff1db; line-height: 1.55; }
-.hero-art { position: relative; height: 100%; min-height: 175px; }
+.hero-art { position: relative; width: min(100%, 420px); height: 100%; min-height: 175px; justify-self: end; }
 .present {
   position: absolute;
   width: min(100%, 280px);
@@ -205,29 +205,45 @@ button:disabled { opacity: .47; cursor: default; }
 :focus-visible { outline: 3px solid #966326; outline-offset: 3px; }
 .storage { margin-top: 14px; padding: 0 19px 18px; font-size: .875rem; }
 
-#gifts { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+#gifts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, max(270px, calc((100% - 32px) / 3))), 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 .gift {
-  display: flex;
-  align-items: flex-start;
-  gap: clamp(10px, 2vw, 20px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 1fr auto;
+  gap: 12px;
+  min-width: 0;
+  aspect-ratio: 1;
   padding: clamp(14px, 2vw, 21px);
   box-shadow: 0 4px 14px #4e2b1410;
   overflow-wrap: anywhere;
-  container-type: inline-size;
 }
+.gift-main { display: flex; align-items: flex-start; gap: clamp(10px, 1.5vw, 18px); grid-column: 1 / -1; }
+.gift:has(.order-controls) .gift-main { grid-column: 1; }
 .gift-details { display: grid; gap: 7px; flex: 1; min-width: 0; }
+.gift-footer {
+  display: flex;
+  grid-column: 1 / -1;
+  grid-row: 2;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
 .gift h3 { font: 400 clamp(1.24rem, 2vw, 1.65rem)/1.12 var(--serif); }
-.actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
+.actions { display: flex; flex-wrap: wrap; gap: 6px; }
 .actions button, .actions .product { padding: 7px 9px; font-size: .875rem; }
 .actions button { background: transparent; border-color: #e9ddcc; }
 .product { background: var(--pine); color: #fffaf1; }
-.price { color: var(--wine); font-size: 1.2rem; font-weight: 750; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.price { margin-inline-start: auto; color: var(--wine); font-size: clamp(1.2rem, 2vw, 1.65rem); font-weight: 750; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .description { white-space: pre-wrap; line-height: 1.5; }
-@container (min-width: 420px) {
-  .gift-details { grid-template-columns: minmax(0, 1fr) auto; column-gap: 18px; }
-  .gift-details > :not(.price) { grid-column: 1; }
-  .gift-details > .price { grid-area: 1 / 2; justify-self: end; align-self: start; font-size: 1.65rem; line-height: 1.15; }
-}
 #status { min-height: 1.5em; margin: 14px 0 24px; color: var(--pine); }
 .image-options { display: grid; gap: 8px; min-width: 0; margin: 8px 0 0; padding: 12px; border: 1px solid var(--line); border-radius: 8px; }
 .image-options legend { font-weight: 700; }
@@ -239,15 +255,18 @@ button:disabled { opacity: .47; cursor: default; }
 
 #order-toggle { display: grid; place-items: center; width: 42px; height: 42px; padding: 0; flex: none; }
 #order-toggle[aria-pressed="true"] { background: var(--pine); color: #fff; }
-.order-controls { display: flex; flex-direction: column; gap: 4px; flex: none; }
+.order-controls { grid-area: 1 / 2; display: flex; flex-direction: column; gap: 4px; }
 .order-step, .drag-handle { display: grid; place-items: center; width: 38px; height: 38px; padding: 0; }
 .drag-handle { border-radius: 8px; background: #f1e8da; color: var(--pine); font-size: 1.4rem; cursor: grab; }
 .drag-handle:active { cursor: grabbing; }
 .gift.dragging { opacity: .55; }
 .gift[data-drop="before"] { box-shadow: 0 -4px var(--pine); }
 .gift[data-drop="after"] { box-shadow: 0 4px var(--pine); }
+.gift[data-drop="left"] { box-shadow: -4px 0 var(--pine); }
+.gift[data-drop="right"] { box-shadow: 4px 0 var(--pine); }
 
 @media (max-width: 760px) {
+  .wrap { width: calc(100% - 40px); }
   .workspace, .workspace.form-open { grid-template-columns: minmax(0, 1fr); }
   .form-reveal { grid-area: 1 / 1; }
   .form-clip .panel { margin-bottom: 16px; }
