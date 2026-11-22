@@ -1,4 +1,10 @@
 const storageKey = 'mi-lista-de-regalos';
+const bannerKey = 'mi-lista-de-regalos-descripcion';
+const bannerDescription = document.querySelector('#banner-description');
+const defaultBannerDescription = bannerDescription.textContent;
+const bannerForm = document.querySelector('#banner-form');
+const bannerText = document.querySelector('#banner-text');
+const bannerStatus = document.querySelector('#banner-status');
 const form = document.querySelector('#gift-form');
 const { name: nameField, link, price, description } = form.elements;
 const list = document.querySelector('#gifts');
@@ -246,9 +252,7 @@ function orderControls(item, gift, index, count) {
 function render(gifts) {
   document.querySelector('#count').textContent = gifts.length === 1 ? '1 regalo' : `${gifts.length} regalos`;
   document.querySelector('#empty').hidden = gifts.length > 0;
-  orderToggle.disabled = gifts.length < 2;
-  if (orderToggle.disabled) ordering = false;
-  orderToggle.setAttribute('aria-pressed', String(ordering));
+  const showOrderControls = ordering && gifts.length > 1;
   list.replaceChildren(...gifts.map((gift, index) => {
     const item = element('li', '', 'gift');
     item.dataset.giftId = gift.id;
@@ -273,19 +277,43 @@ function render(gifts) {
     product.target = '_blank';
     product.rel = 'noopener noreferrer';
     actions.append(product, action('Editar', () => editGift(gift)), action('Eliminar', () => removeGift(gift)));
-    if (!ordering) footer.append(actions);
+    if (!showOrderControls) footer.append(actions);
     footer.append(element('span', euros.format(gift.cents / 100), 'price'));
     item.append(main, footer);
-    if (ordering) item.append(orderControls(item, gift, index, gifts.length));
+    if (showOrderControls) item.append(orderControls(item, gift, index, gifts.length));
     return item;
   }));
 }
 
+function updateBanner(text) {
+  bannerDescription.textContent = text;
+  bannerDescription.hidden = ordering || !text;
+}
+
 orderToggle.addEventListener('click', () => {
   ordering = !ordering;
+  orderToggle.setAttribute('aria-pressed', String(ordering));
+  bannerForm.hidden = !ordering;
+  bannerText.value = bannerDescription.textContent;
+  bannerStatus.textContent = '';
+  updateBanner(bannerDescription.textContent);
   refresh();
-  status.textContent = ordering ? 'Usa los botones para subir o bajar regalos, o arrastra el tirador.' : '';
+  status.textContent = ordering && list.children.length > 1 ? 'Usa los botones para subir o bajar regalos, o arrastra el tirador.' : '';
 });
+
+bannerForm.addEventListener('submit', event => {
+  event.preventDefault();
+  const text = bannerText.value.trim();
+  try {
+    localStorage.setItem(bannerKey, text);
+    updateBanner(text);
+    bannerText.value = text;
+    bannerStatus.textContent = 'Descripción guardada.';
+  } catch {
+    bannerStatus.textContent = 'No se pudo guardar la descripción en este navegador.';
+  }
+});
+bannerText.addEventListener('input', () => { bannerStatus.textContent = ''; });
 
 function resetForm() {
   editing = null;
@@ -419,5 +447,11 @@ function refresh() {
 
 window.addEventListener('storage', event => {
   if (event.key === storageKey || event.key === null) refresh();
+  if (event.key === bannerKey || event.key === null) updateBanner(event.newValue ?? defaultBannerDescription);
 });
+try {
+  updateBanner(localStorage.getItem(bannerKey) ?? defaultBannerDescription);
+} catch {
+  updateBanner(defaultBannerDescription);
+}
 refresh();

@@ -12,8 +12,16 @@
   <main class="wrap">
     <section class="hero" aria-labelledby="titulo">
       <div class="hero-copy">
-        <h1 id="titulo">Mi lista de<br><em>Navidad</em></h1>
-        <p>Guarda los regalos que te haría ilusión encontrar bajo el árbol.</p>
+        <h1 id="titulo">Mi lista de <em>Navidad</em></h1>
+        <p id="banner-description" class="hero-description">Guarda los regalos que te haría ilusión encontrar bajo el árbol.</p>
+        <form id="banner-form" class="banner-form" hidden>
+          <label for="banner-text">Descripción del banner</label>
+          <textarea id="banner-text" rows="2" maxlength="180"></textarea>
+          <div class="banner-actions">
+            <button type="submit">Guardar descripción</button>
+            <span id="banner-status" role="status"></span>
+          </div>
+        </form>
       </div>
       <div class="hero-art" aria-hidden="true">
         <span class="ornament ornament-gold"></span>
@@ -23,7 +31,7 @@
     </section>
     <div class="toolbar">
       <div class="section-title">
-        <button type="button" id="order-toggle" aria-label="Ordenar regalos" aria-pressed="false" aria-controls="gifts" title="Ordenar regalos" disabled>
+        <button type="button" id="order-toggle" aria-label="Editar lista" aria-pressed="false" aria-controls="gifts banner-form" title="Editar descripción y ordenar regalos">
           <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
             <path d="m15 5 4 4M4 20l4.6-1 11-11a2.8 2.8 0 0 0-4-4l-11 11L4 20Z"/>
           </svg>
