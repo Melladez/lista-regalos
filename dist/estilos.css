@@ -211,9 +211,26 @@ button:disabled { opacity: .47; cursor: default; }
 .primary, #form-toggle { background: var(--wine); color: #fffaf1; }
 .primary { margin-top: 10px; padding: 12px; }
 #form-toggle { display: flex; align-items: center; gap: 9px; padding: 10px 14px; box-shadow: 0 3px 8px #72263926; }
-.toggle-icon { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #fff3db28; }
-.toggle-icon::before { content: "+"; }
-#form-toggle[aria-expanded="true"] .toggle-icon::before { content: "−"; }
+.toggle-icon {
+  position: relative;
+  flex: 0 0 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff3db28;
+}
+.toggle-icon::before, .toggle-icon::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+}
+.toggle-icon::after { width: 2px; height: 10px; }
+#form-toggle[aria-expanded="true"] .toggle-icon::after { display: none; }
 :focus-visible { outline: 3px solid #966326; outline-offset: 3px; }
 .storage { margin-top: 14px; padding: 0 19px 18px; font-size: .875rem; }
 
