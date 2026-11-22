@@ -41,10 +41,15 @@ button:hover,.product:hover{filter:brightness(.95)}
 :focus-visible{outline:3px solid #9e74e7;outline-offset:3px}
 .storage{font-size:.875rem;margin-top:14px}
 #gifts{list-style:none;padding:0;margin:0;display:grid;gap:12px}
-.gift{display:flex;align-items:flex-start;gap:clamp(10px,2vw,18px);overflow-wrap:anywhere}
+.gift{display:flex;align-items:flex-start;gap:clamp(10px,2vw,18px);overflow-wrap:anywhere;container-type:inline-size}
 .gift-details{display:grid;gap:8px;flex:1;min-width:0}
 .actions{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.price{color:#563191;font-weight:750;white-space:nowrap}
+.price{color:#563191;font-size:1.2rem;font-weight:750;white-space:nowrap;font-variant-numeric:tabular-nums}
+@container (min-width:420px){
+  .gift-details{grid-template-columns:minmax(0,1fr) auto;column-gap:18px}
+  .gift-details > :not(.price){grid-column:1}
+  .gift-details > .price{grid-area:1 / 2;justify-self:end;align-self:start;font-size:1.65rem;line-height:1.15}
+}
 .description{white-space:pre-wrap}
 #status{min-height:1.5em;margin:14px 0 24px}
 @media(max-width:760px){
