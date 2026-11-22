@@ -375,31 +375,32 @@ button:disabled { opacity: .47; cursor: default; }
 .gift[data-drop="right"] { box-shadow: 4px 0 var(--pine); }
 
 .snowfall {
-  position: fixed;
-  z-index: 5;
+  position: absolute;
+  z-index: 0;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  animation: snowfall-fade 10s linear both;
 }
 .snowflake {
   position: absolute;
   top: -12px;
   left: var(--flake-left);
   width: var(--flake-size);
+  height: calc(100% + 24px);
+  animation: snowfall-drift var(--flake-duration) var(--flake-delay) linear infinite;
+}
+.snowflake::before {
+  content: "";
+  display: block;
+  width: 100%;
   height: var(--flake-size);
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 0 3px #71869b85;
   opacity: .82;
-  animation: snowfall-drift var(--flake-duration) var(--flake-delay) linear infinite;
 }
 @keyframes snowfall-drift {
-  to { transform: translate(var(--flake-drift), calc(100vh + 24px)); }
-}
-@keyframes snowfall-fade {
-  0%, 85% { opacity: 1; }
-  100% { opacity: 0; }
+  to { transform: translate(var(--flake-drift), 100%); }
 }
 
 @media (max-width: 760px) {

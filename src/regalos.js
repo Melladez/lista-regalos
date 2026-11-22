@@ -586,8 +586,7 @@ function startSnowfall() {
     flake.style.setProperty('--flake-drift', `${Math.random() * 80 - 40}px`);
     snow.append(flake);
   }
-  document.body.append(snow);
-  setTimeout(() => snow.remove(), 10000);
+  document.querySelector('.hero').append(snow);
 }
 
 window.addEventListener('storage', event => {
