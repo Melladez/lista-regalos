@@ -1,0 +1,15 @@
+{
+  "name": "mi-lista-de-navidad",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "build": "node --check dist/regalos.js && node --check api/imagen.js && node --check worker.mjs && node build-vercel.mjs"
+  },
+  "dependencies": {
+    "htmlparser2": "^12.0.0"
+  }
+}

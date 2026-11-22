@@ -5,6 +5,48 @@ const shops = [
   'ebay.es', 'es.aliexpress.com', 'aliexpress.com', 'carrefour.es', 'lidl.es',
   'casadellibro.com', 'apple.com', 'lego.com', 'game.es', 'zalando.es'
 ];
+const imageKeys = ['og:image:secure_url', 'og:image', 'twitter:image', 'image', 'image_src'];
+
+export function recordImage(images, tag, getAttribute) {
+  let key;
+  let content;
+  if (tag === 'meta') {
+    key = getAttribute('property') ?? getAttribute('name') ?? getAttribute('itemprop');
+    content = getAttribute('content');
+  } else if (tag === 'link' && getAttribute('rel') === 'image_src') {
+    key = 'image_src';
+    content = getAttribute('href');
+  }
+  if (content && imageKeys.includes(key) && !images.has(key)) images.set(key, content);
+}
+
+export async function readImageStream(body, images, onChunk) {
+  if (!body) return;
+  const reader = body.getReader();
+  const limit = 1024 * 1024;
+  try {
+    let bytes = 0;
+    while (bytes < limit && !images.has('og:image:secure_url') && !images.has('og:image')) {
+      const { done, value: chunk } = await reader.read();
+      if (done) break;
+      onChunk?.(chunk.subarray(0, limit - bytes));
+      bytes += chunk.byteLength;
+    }
+  } finally {
+    await reader.cancel();
+  }
+}
+
+async function readWorkerMetadata(response) {
+  const images = new Map();
+  const transformed = new HTMLRewriter().on('meta, link[rel="image_src"]', {
+    element(node) {
+      recordImage(images, node.tagName, name => node.getAttribute(name));
+    }
+  }).transform(response);
+  await readImageStream(transformed.body, images);
+  return images;
+}
 
 function shopUrl(value, base) {
   const url = new URL(value, base);
@@ -17,7 +59,7 @@ function shopUrl(value, base) {
   return url;
 }
 
-async function findImage(value) {
+async function findImage(value, readMetadata) {
   let url = shopUrl(value);
   const signal = AbortSignal.timeout(5500);
   for (let i = 0; i < 4; i++) {
@@ -33,32 +75,8 @@ async function findImage(value) {
       await response.body?.cancel();
       break;
     }
-    const images = new Map();
-    const transformed = new HTMLRewriter().on('meta', {
-      element(meta) {
-        const key = meta.getAttribute('property') ?? meta.getAttribute('name') ?? meta.getAttribute('itemprop');
-        const content = meta.getAttribute('content');
-        if (content && ['og:image:secure_url', 'og:image', 'twitter:image', 'image'].includes(key) && !images.has(key)) {
-          images.set(key, content);
-        }
-      }
-    }).on('link[rel="image_src"]', {
-      element(node) {
-        if (!images.has('image_src')) images.set('image_src', node.getAttribute('href'));
-      }
-    }).transform(response);
-    const reader = transformed.body.getReader();
-    try {
-      let bytes = 0;
-      while (bytes < 1024 * 1024 && !images.has('og:image:secure_url') && !images.has('og:image')) {
-        const { done, value: chunk } = await reader.read();
-        if (done) break;
-        bytes += chunk.byteLength;
-      }
-    } finally {
-      await reader.cancel();
-    }
-    for (const key of ['og:image:secure_url', 'og:image', 'twitter:image', 'image', 'image_src']) {
+    const images = await readMetadata(response);
+    for (const key of imageKeys) {
       const candidate = images.get(key);
       if (!candidate) continue;
       try {
@@ -73,19 +91,23 @@ async function findImage(value) {
   return null;
 }
 
+export async function imageResponse(request, readMetadata = readWorkerMetadata) {
+  const url = new URL(request.url).searchParams.get('url');
+  let image = null;
+  try {
+    if (url && url.length <= 2048) image = await findImage(url, readMetadata);
+  } catch {
+    // Direct URLs and uploads remain available if the shop blocks the lookup.
+  }
+  return Response.json({ image }, { headers: { 'Cache-Control': 'no-store' } });
+}
+
 export default {
   async fetch(request) {
-    const { pathname, searchParams } = new URL(request.url);
+    const { pathname } = new URL(request.url);
     if (request.method !== 'GET' && request.method !== 'HEAD') return new Response(null, { status: 405 });
     if (pathname === '/api/imagen' && request.method === 'GET') {
-      const url = searchParams.get('url');
-      let image = null;
-      try {
-        if (url && url.length <= 2048) image = await findImage(url);
-      } catch {
-        // A blocked or unsupported shop can still use a direct URL or upload.
-      }
-      return Response.json({ image }, { headers: { 'Cache-Control': 'no-store' } });
+      return imageResponse(request);
     }
     const asset = assets.get(pathname === '/index.html' ? '/' : pathname);
     if (!asset) return new Response('Página no encontrada', { status: 404 });
