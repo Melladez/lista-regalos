@@ -2,6 +2,7 @@ const storageKey = 'mi-lista-de-regalos';
 const form = document.querySelector('#gift-form');
 const { name: nameField, link, price, description } = form.elements;
 const list = document.querySelector('#gifts');
+const orderToggle = document.querySelector('#order-toggle');
 const status = document.querySelector('#status');
 const panel = document.querySelector('#gift-panel');
 const toggle = document.querySelector('#form-toggle');
@@ -16,6 +17,8 @@ const preview = document.querySelector('#image-preview');
 const imageStatus = document.querySelector('#image-status');
 const euros = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
 let editing = null;
+let ordering = false;
+let draggedGiftId = null;
 let selectedImage = '';
 let imageRequest = 0;
 
@@ -136,10 +139,94 @@ function action(text, handler) {
   return button;
 }
 
+function moveGift(id, destination, focusControl) {
+  try {
+    const gifts = readGifts();
+    const from = gifts.findIndex(gift => gift.id === id);
+    if (from < 0) return;
+    const to = destination(gifts, from);
+    if (to < 0 || to >= gifts.length || to === from) return;
+    const [gift] = gifts.splice(from, 1);
+    gifts.splice(to, 0, gift);
+    persist(gifts);
+    status.textContent = `${gift.name} ahora está en la posición ${to + 1} de ${gifts.length}.`;
+    if (focusControl) {
+      const controls = list.children[to].querySelectorAll('.order-step:not(:disabled)');
+      const preferred = Array.from(controls).find(button => button.dataset.step === focusControl);
+      (preferred ?? controls[0] ?? orderToggle).focus();
+    }
+  } catch {
+    status.textContent = 'No se pudo guardar el orden en este navegador.';
+  }
+}
+
+function orderControls(item, gift, index, count) {
+  const controls = element('div', '', 'order-controls');
+  for (const [label, symbol, step] of [['Subir', '↑', -1], ['Bajar', '↓', 1]]) {
+    const button = action(symbol, () => moveGift(gift.id, (gifts, from) => from + step, String(step)));
+    button.className = 'order-step';
+    button.dataset.step = String(step);
+    button.disabled = index + step < 0 || index + step >= count;
+    button.setAttribute('aria-label', `${label} ${gift.name}`);
+    button.title = label;
+    controls.append(button);
+  }
+
+  const handle = element('span', '⠿', 'drag-handle');
+  handle.draggable = true;
+  handle.title = 'Arrastrar para mover';
+  handle.setAttribute('aria-hidden', 'true');
+  handle.addEventListener('dragstart', event => {
+    draggedGiftId = gift.id;
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', gift.id);
+    event.dataTransfer.setDragImage(item, 18, 18);
+    item.classList.add('dragging');
+  });
+  handle.addEventListener('dragend', () => {
+    draggedGiftId = null;
+    item.classList.remove('dragging');
+    list.querySelector('[data-drop]')?.removeAttribute('data-drop');
+  });
+  const dropAfter = event => {
+    const bounds = item.getBoundingClientRect();
+    return event.clientY >= bounds.top + bounds.height / 2;
+  };
+  item.addEventListener('dragover', event => {
+    if (draggedGiftId === null || draggedGiftId === gift.id) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    const previous = list.querySelector('[data-drop]');
+    if (previous !== item) previous?.removeAttribute('data-drop');
+    item.dataset.drop = dropAfter(event) ? 'after' : 'before';
+  });
+  item.addEventListener('dragleave', event => {
+    if (!item.contains(event.relatedTarget)) item.removeAttribute('data-drop');
+  });
+  item.addEventListener('drop', event => {
+    if (draggedGiftId === null || draggedGiftId === gift.id) return;
+    event.preventDefault();
+    const id = draggedGiftId;
+    const after = dropAfter(event);
+    draggedGiftId = null;
+    item.removeAttribute('data-drop');
+    list.querySelector('.dragging')?.classList.remove('dragging');
+    moveGift(id, (gifts, from) => {
+      const target = gifts.findIndex(entry => entry.id === gift.id);
+      return target < 0 ? -1 : target + Number(after) - Number(from < target);
+    });
+  });
+  controls.append(handle);
+  return controls;
+}
+
 function render(gifts) {
   document.querySelector('#count').textContent = gifts.length === 1 ? '1 regalo' : `${gifts.length} regalos`;
   document.querySelector('#empty').hidden = gifts.length > 0;
-  list.replaceChildren(...gifts.map(gift => {
+  orderToggle.disabled = gifts.length < 2;
+  if (orderToggle.disabled) ordering = false;
+  orderToggle.setAttribute('aria-pressed', String(ordering));
+  list.replaceChildren(...gifts.map((gift, index) => {
     const item = element('li', '', 'gift');
     if (gift.image) {
       const image = element('img', '', 'gift-image');
@@ -160,11 +247,18 @@ function render(gifts) {
     product.target = '_blank';
     product.rel = 'noopener noreferrer';
     actions.append(product, action('Editar', () => editGift(gift)), action('Eliminar', () => removeGift(gift)));
-    details.append(actions);
+    if (!ordering) details.append(actions);
     item.append(details);
+    if (ordering) item.append(orderControls(item, gift, index, gifts.length));
     return item;
   }));
 }
+
+orderToggle.addEventListener('click', () => {
+  ordering = !ordering;
+  refresh();
+  status.textContent = ordering ? 'Usa los botones para subir o bajar regalos, o arrastra el tirador.' : '';
+});
 
 function resetForm() {
   editing = null;

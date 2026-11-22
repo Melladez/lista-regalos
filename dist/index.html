@@ -18,7 +18,14 @@
       <div class="present" aria-hidden="true"><i></i><b></b><span>✧</span><small>✦</small></div>
     </section>
     <div class="toolbar">
-      <div class="section-title"><h2 id="lista-titulo">Mis regalos</h2><span id="count"></span></div>
+      <div class="section-title">
+        <button type="button" id="order-toggle" aria-label="Ordenar regalos" aria-pressed="false" aria-controls="gifts" title="Ordenar regalos" disabled>
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="m15 5 4 4M4 20l4.6-1 11-11a2.8 2.8 0 0 0-4-4l-11 11L4 20Z"/>
+          </svg>
+        </button>
+        <h2 id="lista-titulo">Mis regalos</h2><span id="count"></span>
+      </div>
       <button type="button" id="form-toggle" aria-expanded="false" aria-controls="gift-panel"><span aria-hidden="true" class="toggle-icon"></span><span id="form-title">Añadir regalo</span></button>
     </div>
     <div class="workspace">
