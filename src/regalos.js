@@ -572,6 +572,24 @@ function refresh() {
   }
 }
 
+function startSnowfall() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const snow = element('div', '', 'snowfall');
+  snow.setAttribute('aria-hidden', 'true');
+  for (let i = 0; i < 34; i++) {
+    const flake = element('span', '', 'snowflake');
+    const duration = 4 + Math.random() * 5;
+    flake.style.setProperty('--flake-left', `${Math.random() * 100}%`);
+    flake.style.setProperty('--flake-size', `${2 + Math.random() * 5}px`);
+    flake.style.setProperty('--flake-duration', `${duration}s`);
+    flake.style.setProperty('--flake-delay', `${-Math.random() * duration}s`);
+    flake.style.setProperty('--flake-drift', `${Math.random() * 80 - 40}px`);
+    snow.append(flake);
+  }
+  document.body.append(snow);
+  setTimeout(() => snow.remove(), 10000);
+}
+
 window.addEventListener('storage', event => {
   if (event.key === storageKey || event.key === null) refresh();
   if (event.key === bannerKey || event.key === null) updateBanner(event.newValue ?? defaultBannerDescription);
@@ -582,3 +600,4 @@ try {
   updateBanner(defaultBannerDescription);
 }
 refresh();
+startSnowfall();

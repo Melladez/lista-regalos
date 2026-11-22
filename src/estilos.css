@@ -152,17 +152,44 @@ h1 em { color: var(--gold); }
   border-bottom: 1px solid var(--line);
 }
 .section-title { display: flex; align-items: center; gap: 10px; }
-.toolbar-actions { position: relative; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-inline-start: auto; }
-.transfer { font-size: .875rem; }
+.toolbar-actions {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: min(350px, 100%);
+  gap: 8px;
+  margin-inline-start: auto;
+}
+.transfer summary, #form-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 10px;
+  font-weight: 700;
+  line-height: 1.2;
+}
 .transfer summary {
-  padding: 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--paper);
   color: var(--pine);
-  font-weight: 700;
+  list-style: none;
   cursor: pointer;
 }
+.transfer summary::-webkit-details-marker { display: none; }
+.transfer summary::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-top: -3px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 200ms ease;
+}
+.transfer[open] summary::after { transform: rotate(225deg); }
 .transfer-menu {
   position: absolute;
   z-index: 3;
@@ -175,6 +202,11 @@ h1 em { color: var(--gold); }
   box-shadow: 0 8px 20px #4e2b1420;
 }
 .transfer-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.transfer[open] .transfer-menu { animation: transfer-open 220ms ease-out both; }
+@keyframes transfer-open {
+  from { opacity: 0; transform: translateY(-8px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 #transfer-status:not(:empty) { margin-top: 8px; color: var(--muted); }
 h2 { font: 400 clamp(1.45rem, 3vw, 2.25rem)/1.1 var(--serif); }
 #count { padding: 4px 9px; border-radius: 99px; background: #eee5d5; color: #59483b; font-size: .875rem; }
@@ -234,7 +266,7 @@ button:hover, .product:hover { filter: brightness(.95); }
 button:disabled { opacity: .47; cursor: default; }
 .primary, #form-toggle { background: var(--wine); color: #fffaf1; }
 .primary { margin-top: 10px; padding: 12px; }
-#form-toggle { display: flex; align-items: center; gap: 9px; padding: 10px 14px; box-shadow: 0 3px 8px #72263926; }
+#form-toggle { box-shadow: 0 3px 8px #72263926; }
 .toggle-icon {
   position: relative;
   flex: 0 0 22px;
@@ -342,6 +374,34 @@ button:disabled { opacity: .47; cursor: default; }
 .gift[data-drop="left"] { box-shadow: -4px 0 var(--pine); }
 .gift[data-drop="right"] { box-shadow: 4px 0 var(--pine); }
 
+.snowfall {
+  position: fixed;
+  z-index: 5;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  animation: snowfall-fade 10s linear both;
+}
+.snowflake {
+  position: absolute;
+  top: -12px;
+  left: var(--flake-left);
+  width: var(--flake-size);
+  height: var(--flake-size);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 3px #71869b85;
+  opacity: .82;
+  animation: snowfall-drift var(--flake-duration) var(--flake-delay) linear infinite;
+}
+@keyframes snowfall-drift {
+  to { transform: translate(var(--flake-drift), calc(100vh + 24px)); }
+}
+@keyframes snowfall-fade {
+  0%, 85% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 @media (max-width: 760px) {
   .wrap { width: calc(100% - 40px); }
   .workspace, .workspace.form-open { grid-template-columns: minmax(0, 1fr); }
@@ -350,6 +410,7 @@ button:disabled { opacity: .47; cursor: default; }
   .hero { min-height: 290px; margin-top: 24px; }
 }
 @media (max-width: 520px) {
+  .transfer summary, #form-toggle { font-size: .875rem; }
   .wrap { width: calc(100% - 28px); }
   .hero { grid-template-columns: minmax(0, 1fr) 25%; min-height: 220px; margin: 16px 0 23px; padding: 24px; }
   .hero::before { inset: 7px; }
@@ -365,5 +426,7 @@ button:disabled { opacity: .47; cursor: default; }
   .order-step { width: 44px; height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .workspace, .form-reveal, .gift::after, .favorite-button { transition: none; }
+  .workspace, .form-reveal, .gift::after, .favorite-button, .transfer summary::after { transition: none; }
+  .transfer[open] .transfer-menu { animation: none; }
+  .snowfall { display: none; }
 }
