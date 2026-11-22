@@ -3,7 +3,8 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 const files = [
   ['/', 'index.html', 'text/html'],
   ['/estilos.css', 'estilos.css', 'text/css'],
-  ['/regalos.js', 'regalos.js', 'text/javascript']
+  ['/regalos.js', 'regalos.js', 'text/javascript'],
+  ['/regalo.svg', 'regalo.svg', 'image/svg+xml']
 ];
 const assets = await Promise.all(files.map(async ([path, file, type]) => [
   path, { type, body: await readFile(new URL('./src/' + file, import.meta.url), 'utf8') }
