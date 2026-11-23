@@ -7,7 +7,8 @@
     "node": "24.x"
   },
   "scripts": {
-    "build": "node --check src/regalos.js && node --check api/imagen.js && node --check worker.mjs && node build-vercel.mjs"
+    "dev": "node servidor-local.mjs",
+    "build": "node --check src/regalos.js && node --check src/datos-regalos.js && node --check api/imagen.js && node --check worker.mjs && node build-vercel.mjs"
   },
   "dependencies": {
     "htmlparser2": "^12.0.0"

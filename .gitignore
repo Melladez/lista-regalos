@@ -1,5 +1,6 @@
 /dist/
 /public/
+/regalos.json.*.tmp
 node_modules/
 .vercel/
 .env

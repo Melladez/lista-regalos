@@ -1,4 +1,31 @@
-const storageKey = 'mi-lista-de-regalos';
+import { validateBackup, webUrl } from './datos-regalos.js';
+
+const appearanceKey = 'mi-lista-de-regalos-estilo';
+const appearanceSwitch = document.querySelector('#appearance-switch');
+const appearanceLabel = appearanceSwitch.querySelector('.appearance-label');
+
+function applyAppearance(isNew) {
+  document.documentElement.toggleAttribute('data-new-appearance', isNew);
+  appearanceSwitch.setAttribute('aria-checked', String(isNew));
+  appearanceLabel.textContent = isNew ? 'Nueva' : 'Actual';
+}
+
+try {
+  applyAppearance(localStorage.getItem(appearanceKey) === 'nueva');
+} catch {
+  // The switch still works when browser storage is unavailable.
+}
+
+appearanceSwitch.addEventListener('click', () => {
+  const isNew = appearanceSwitch.getAttribute('aria-checked') === 'false';
+  applyAppearance(isNew);
+  try {
+    localStorage.setItem(appearanceKey, isNew ? 'nueva' : 'actual');
+  } catch {
+    // Keep the chosen appearance for the current page.
+  }
+});
+
 const bannerKey = 'mi-lista-de-regalos-descripcion';
 const bannerDescription = document.querySelector('#banner-description');
 const defaultBannerDescription = bannerDescription.textContent;
@@ -27,6 +54,10 @@ let ordering = false;
 let draggedGiftId = null;
 let selectedImage = '';
 let imageRequest = 0;
+let savedGifts = [];
+let revision = null;
+let writable = false;
+let saving = false;
 
 function showImage(src, message = '') {
   imageRequest++;
@@ -120,20 +151,20 @@ preview.addEventListener('error', () => {
 });
 
 function readGifts() {
-  const gifts = JSON.parse(localStorage.getItem(storageKey) ?? '[]');
-  if (!Array.isArray(gifts)) throw new Error('Formato de lista incorrecto');
-  return gifts;
+  return structuredClone(savedGifts);
 }
 
 const importFile = document.querySelector('#import-file');
+const importButton = document.querySelector('#import-list');
+const exportButton = document.querySelector('#export-list');
 const transferStatus = document.querySelector('#transfer-status');
 
-document.querySelector('#export-list').addEventListener('click', () => {
+exportButton.addEventListener('click', () => {
   try {
     const backup = {
       version: 1,
       gifts: readGifts(),
-      banner: localStorage.getItem(bannerKey)
+      banner: writable ? localStorage.getItem(bannerKey) : null
     };
     const url = URL.createObjectURL(new Blob([JSON.stringify(backup)], { type: 'application/json' }));
     const download = document.createElement('a');
@@ -147,45 +178,15 @@ document.querySelector('#export-list').addEventListener('click', () => {
   }
 });
 
-function parseBackup(text) {
-  const backup = JSON.parse(text);
-  if (backup?.version !== 1 || !Array.isArray(backup.gifts) ||
-      !(backup.banner === null || typeof backup.banner === 'string' && backup.banner.length <= 180)) {
-    throw new Error('Copia inválida');
-  }
-  const ids = new Set();
-  const gifts = backup.gifts.map(gift => {
-    if (!gift || typeof gift.id !== 'string' || !gift.id || ids.has(gift.id) ||
-        typeof gift.name !== 'string' || !gift.name.trim() || gift.name.length > 100 ||
-        typeof gift.description !== 'string' || gift.description.length > 300 ||
-        typeof gift.link !== 'string' || !Number.isSafeInteger(gift.cents) || gift.cents < 0) {
-      throw new Error('Regalo inválido');
-    }
-    ids.add(gift.id);
-    const image = gift.image ?? '';
-    if (typeof image !== 'string') throw new Error('Imagen inválida');
-    return {
-      id: gift.id,
-      name: gift.name,
-      description: gift.description,
-      link: webUrl(gift.link),
-      cents: gift.cents,
-      image: !image || /^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+=*$/.test(image) ? image : webUrl(image),
-      favorite: gift.favorite === true
-    };
-  });
-  return { gifts, banner: backup.banner };
-}
-
-document.querySelector('#import-list').addEventListener('click', () => importFile.click());
+importButton.addEventListener('click', () => importFile.click());
 importFile.addEventListener('change', async () => {
   const file = importFile.files[0];
-  if (!file) return;
+  if (!file || !writable) return;
   importFile.value = '';
   let backup;
   try {
     if (file.size > 12 * 1024 * 1024) throw new Error('Copia demasiado grande');
-    backup = parseBackup(await file.text());
+    backup = validateBackup(JSON.parse(await file.text()));
   } catch {
     transferStatus.textContent = 'El archivo seleccionado no es una copia válida de la lista.';
     return;
@@ -197,7 +198,7 @@ importFile.addEventListener('change', async () => {
     const restoreBanner = backup.banner !== null && localStorage.getItem(bannerKey) === null;
     if (restoreBanner) localStorage.setItem(bannerKey, backup.banner);
     try {
-      localStorage.setItem(storageKey, JSON.stringify([...current, ...additions]));
+      if (additions.length) await persist([...current, ...additions]);
     } catch (error) {
       if (restoreBanner) localStorage.removeItem(bannerKey);
       throw error;
@@ -208,16 +209,10 @@ importFile.addEventListener('change', async () => {
     }
     refresh();
     transferStatus.textContent = additions.length === 1 ? 'Se ha importado 1 regalo.' : `Se han importado ${additions.length} regalos.`;
-  } catch {
-    transferStatus.textContent = 'No se pudo guardar la copia. Comprueba el espacio disponible en este navegador.';
+  } catch (error) {
+    transferStatus.textContent = error.message;
   }
 });
-
-function webUrl(value) {
-  const url = new URL(value);
-  if (!['https:', 'http:'].includes(url.protocol)) throw new Error('Enlace no válido');
-  return url.href;
-}
 
 function element(tag, content, className) {
   const node = document.createElement(tag);
@@ -233,7 +228,7 @@ function action(text, handler) {
   return button;
 }
 
-function moveGift(id, destination, focusControl) {
+async function moveGift(id, destination, focusControl) {
   try {
     const gifts = readGifts();
     const from = gifts.findIndex(gift => gift.id === id);
@@ -245,7 +240,7 @@ function moveGift(id, destination, focusControl) {
       : null;
     const [gift] = gifts.splice(from, 1);
     gifts.splice(to, 0, gift);
-    persist(gifts);
+    await persist(gifts);
     if (previousPositions) animateGiftPositions(previousPositions);
     status.textContent = `${gift.name} ahora está en la posición ${to + 1} de ${gifts.length}.`;
     if (focusControl) {
@@ -253,8 +248,8 @@ function moveGift(id, destination, focusControl) {
       const preferred = Array.from(controls).find(button => button.dataset.step === focusControl);
       (preferred ?? controls[0] ?? orderToggle).focus();
     }
-  } catch {
-    status.textContent = 'No se pudo guardar el orden en este navegador.';
+  } catch (error) {
+    status.textContent = error.message;
   }
 }
 
@@ -340,13 +335,17 @@ function orderControls(item, gift, index, count) {
 function favoriteControl(item, gift) {
   const star = element('span', '', 'favorite-star');
   star.setAttribute('aria-hidden', 'true');
-  const button = action('', () => {
+  const button = action('', async () => {
     try {
       const gifts = readGifts();
       const entry = gifts.find(other => other.id === gift.id);
       if (!entry) return;
       entry.favorite = !entry.favorite;
-      localStorage.setItem(storageKey, JSON.stringify(gifts));
+      await persist(gifts, false);
+      if (!item.isConnected) {
+        refresh();
+        return;
+      }
       update(entry.favorite);
       if (entry.favorite && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         star.animate([
@@ -357,11 +356,12 @@ function favoriteControl(item, gift) {
           { transform: 'rotate(0deg) scale(1)' }
         ], { duration: 420, easing: 'ease-out' });
       }
-    } catch {
-      status.textContent = 'No se pudo guardar el favorito en este navegador.';
+    } catch (error) {
+      status.textContent = error.message;
     }
   });
   button.className = 'favorite-button';
+  button.disabled = !writable;
   button.setAttribute('aria-label', `Favorito: ${gift.name}`);
   button.append(star);
 
@@ -482,20 +482,35 @@ function closeForm() {
   setFormOpen(false);
 }
 
-function persist(gifts) {
-  localStorage.setItem(storageKey, JSON.stringify(gifts));
-  render(gifts);
+async function persist(gifts, redraw = true) {
+  if (!writable) throw new Error('La lista es de solo lectura.');
+  if (saving) throw new Error('Hay un guardado en curso. Vuelve a intentarlo en unos segundos.');
+  saving = true;
+  try {
+    const response = await fetch('/regalos.json', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'If-Match': revision },
+      body: JSON.stringify({ version: 1, gifts, banner: null })
+    }).catch(() => null);
+    if (response?.status === 412) throw new Error('La lista cambió. Recarga la página antes de volver a guardar.');
+    if (!response?.ok) throw new Error('No se pudo guardar la lista en regalos.json.');
+    revision = response.headers.get('ETag');
+    savedGifts = gifts;
+    if (redraw) render(gifts);
+  } finally {
+    saving = false;
+  }
 }
 
-function removeGift(gift) {
+async function removeGift(gift) {
   if (!window.confirm(`¿Eliminar «${gift.name}» de tu lista?`)) return;
   try {
-    persist(readGifts().filter(item => item.id !== gift.id));
+    await persist(readGifts().filter(item => item.id !== gift.id));
     if (editing === gift.id) closeForm();
     status.textContent = 'Regalo eliminado.';
     toggle.focus();
-  } catch {
-    status.textContent = 'No se pudo eliminar el regalo.';
+  } catch (error) {
+    status.textContent = error.message;
   }
 }
 
@@ -510,7 +525,7 @@ toggle.addEventListener('click', () => {
   if (open) nameField.focus({ preventScroll: true });
 });
 
-form.addEventListener('submit', event => {
+form.addEventListener('submit', async event => {
   event.preventDefault();
   if (save.disabled) return;
   const name = nameField.value.trim();
@@ -552,6 +567,7 @@ form.addEventListener('submit', event => {
     description: description.value.trim(),
     image
   };
+  form.inert = true;
   try {
     const gifts = readGifts();
     if (editing && !gifts.some(item => item.id === editing)) {
@@ -559,20 +575,18 @@ form.addEventListener('submit', event => {
       status.textContent = 'El regalo ya se ha eliminado.';
       return;
     }
-    persist(editing ? gifts.map(item => item.id === editing ? { ...item, ...gift } : item) : [gift, ...gifts]);
+    await persist(editing ? gifts.map(item => item.id === editing ? { ...item, ...gift } : item) : [gift, ...gifts]);
     status.textContent = editing ? 'Cambios guardados.' : 'Regalo añadido.';
     closeForm();
-  } catch {
-    status.textContent = 'No se pudo guardar el regalo. Si el navegador se ha quedado sin espacio, prueba con un enlace de imagen.';
+  } catch (error) {
+    status.textContent = error.message;
+  } finally {
+    form.inert = false;
   }
 });
 
 function refresh() {
-  try {
-    render(readGifts());
-  } catch {
-    status.textContent = 'No se pudo cargar la lista en este navegador.';
-  }
+  render(savedGifts);
 }
 
 function startSnowfall() {
@@ -592,14 +606,33 @@ function startSnowfall() {
   document.querySelector('.hero').append(snow);
 }
 
-window.addEventListener('storage', event => {
-  if (event.key === storageKey || event.key === null) refresh();
-  if (event.key === bannerKey || event.key === null) updateBanner(event.newValue ?? defaultBannerDescription);
-});
-try {
-  updateBanner(localStorage.getItem(bannerKey) ?? defaultBannerDescription);
-} catch {
-  updateBanner(defaultBannerDescription);
+async function loadGifts() {
+  try {
+    const response = await fetch('/regalos.json', { cache: 'no-store' });
+    if (!response.ok) throw new Error();
+    const gifts = await response.json();
+    savedGifts = validateBackup({ version: 1, gifts, banner: null }).gifts;
+    revision = response.headers.get('ETag');
+    writable = Boolean(revision) && response.headers.get('X-Regalos-Editable') === 'true';
+    refresh();
+    exportButton.disabled = false;
+    orderToggle.hidden = toggle.hidden = importButton.hidden = !writable;
+    if (writable) {
+      try {
+        updateBanner(localStorage.getItem(bannerKey) ?? defaultBannerDescription);
+      } catch {
+        updateBanner(defaultBannerDescription);
+      }
+      window.addEventListener('storage', event => {
+        if (event.key === bannerKey || event.key === null) updateBanner(event.newValue ?? defaultBannerDescription);
+      });
+    } else {
+      document.querySelector('#empty h3').textContent = 'Todavía no hay regalos';
+      document.querySelector('#empty p').hidden = true;
+    }
+  } catch {
+    status.textContent = 'No se pudo cargar la lista desde regalos.json.';
+  }
 }
-refresh();
+loadGifts();
 startSnowfall();

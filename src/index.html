@@ -7,10 +7,16 @@
   <title>Mi lista de regalos</title>
   <link rel="icon" type="image/svg+xml" href="/regalo.svg">
   <link rel="stylesheet" href="estilos.css">
-  <script src="regalos.js" defer></script>
+  <script src="regalos.js" type="module"></script>
 </head>
 <body>
   <main class="wrap">
+    <div class="appearance-bar">
+      <button class="appearance-switch" id="appearance-switch" type="button" role="switch" aria-checked="false" aria-label="Estilo nuevo">
+        <span class="appearance-label" aria-hidden="true">Actual</span>
+        <span class="appearance-track" aria-hidden="true"></span>
+      </button>
+    </div>
     <section class="hero" aria-labelledby="titulo">
       <div class="hero-copy">
         <h1 id="titulo">Mi lista de <em>Navidad</em></h1>
@@ -32,7 +38,7 @@
     </section>
     <div class="toolbar">
       <div class="section-title">
-        <button type="button" id="order-toggle" aria-label="Editar lista" aria-pressed="false" aria-controls="gifts banner-form" title="Editar descripción y ordenar regalos">
+        <button type="button" id="order-toggle" aria-label="Editar lista" aria-pressed="false" aria-controls="gifts banner-form" title="Editar descripción y ordenar regalos" hidden>
           <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
             <path d="m15 5 4 4M4 20l4.6-1 11-11a2.8 2.8 0 0 0-4-4l-11 11L4 20Z"/>
           </svg>
@@ -44,19 +50,19 @@
           <summary>Trasladar lista</summary>
           <div class="transfer-menu">
             <div class="transfer-actions">
-              <button type="button" id="export-list">Exportar lista</button>
-              <button type="button" id="import-list">Importar lista</button>
+              <button type="button" id="export-list" disabled>Exportar lista</button>
+              <button type="button" id="import-list" hidden>Importar lista</button>
               <input id="import-file" type="file" accept=".json,application/json" hidden>
             </div>
             <p id="transfer-status" role="status"></p>
           </div>
         </details>
-        <button type="button" id="form-toggle" aria-expanded="false" aria-controls="gift-panel"><span aria-hidden="true" class="toggle-icon"></span><span id="form-title">Añadir regalo</span></button>
+        <button type="button" id="form-toggle" aria-expanded="false" aria-controls="gift-panel" hidden><span aria-hidden="true" class="toggle-icon"></span><span id="form-title">Añadir regalo</span></button>
       </div>
     </div>
     <div class="workspace">
       <section aria-labelledby="lista-titulo">
-        <div id="empty" class="empty">
+        <div id="empty" class="empty" hidden>
           <span aria-hidden="true">✧</span>
           <h3>Tu lista empieza aquí</h3>
           <p>Añade tu primer regalo con el formulario.</p>
@@ -89,7 +95,7 @@
               <button class="primary" id="save" type="submit">Guardar regalo</button>
               <button id="cancel" type="button" hidden>Cancelar edición</button>
             </form>
-            <p class="storage">La lista se guarda en este navegador.</p>
+            <p class="storage">La lista se guarda en regalos.json.</p>
           </div>
         </div>
       </div>
