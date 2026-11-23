@@ -11,12 +11,14 @@
 </head>
 <body>
   <main class="wrap">
+    <!-- Estilo nuevo desactivado temporalmente.
     <div class="appearance-bar">
       <button class="appearance-switch" id="appearance-switch" type="button" role="switch" aria-checked="false" aria-label="Estilo nuevo">
         <span class="appearance-label" aria-hidden="true">Actual</span>
         <span class="appearance-track" aria-hidden="true"></span>
       </button>
     </div>
+    -->
     <section class="hero" aria-labelledby="titulo">
       <div class="hero-copy">
         <h1 id="titulo">Mi lista de <em>Navidad</em></h1>
@@ -45,6 +47,14 @@
         </button>
         <h2 id="lista-titulo">Mis regalos</h2><span id="count"></span>
       </div>
+      <label class="gift-sort" for="gift-sort">
+        Orden
+        <select id="gift-sort" aria-controls="gifts">
+          <option value="default">Por defecto</option>
+          <option value="price-desc">Precio: mayor a menor</option>
+          <option value="price-asc">Precio: menor a mayor</option>
+        </select>
+      </label>
       <div class="toolbar-actions">
         <details class="transfer">
           <summary>Trasladar lista</summary>

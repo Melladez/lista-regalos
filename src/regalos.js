@@ -1,5 +1,6 @@
 import { validateBackup, webUrl } from './datos-regalos.js';
 
+/* Estilo nuevo desactivado temporalmente.
 const appearanceKey = 'mi-lista-de-regalos-estilo';
 const appearanceSwitch = document.querySelector('#appearance-switch');
 const appearanceLabel = appearanceSwitch.querySelector('.appearance-label');
@@ -25,6 +26,7 @@ appearanceSwitch.addEventListener('click', () => {
     // Keep the chosen appearance for the current page.
   }
 });
+*/
 
 const bannerKey = 'mi-lista-de-regalos-descripcion';
 const bannerDescription = document.querySelector('#banner-description');
@@ -35,6 +37,7 @@ const bannerStatus = document.querySelector('#banner-status');
 const form = document.querySelector('#gift-form');
 const { name: nameField, link, price, description } = form.elements;
 const list = document.querySelector('#gifts');
+const giftSort = document.querySelector('#gift-sort');
 const orderToggle = document.querySelector('#order-toggle');
 const status = document.querySelector('#status');
 const panel = document.querySelector('#gift-panel');
@@ -236,7 +239,7 @@ async function moveGift(id, destination, focusControl) {
     const to = destination(gifts, from);
     if (to < 0 || to >= gifts.length || to === from) return;
     const previousPositions = focusControl && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      ? new Map(Array.from(list.children, card => [card.dataset.giftId, card.getBoundingClientRect()]))
+      ? captureGiftPositions()
       : null;
     const [gift] = gifts.splice(from, 1);
     gifts.splice(to, 0, gift);
@@ -251,6 +254,10 @@ async function moveGift(id, destination, focusControl) {
   } catch (error) {
     status.textContent = error.message;
   }
+}
+
+function captureGiftPositions() {
+  return new Map(Array.from(list.children, card => [card.dataset.giftId, card.getBoundingClientRect()]));
 }
 
 function animateGiftPositions(previousPositions) {
@@ -338,17 +345,39 @@ function favoriteControl(item, gift) {
   const button = action('', async () => {
     try {
       const gifts = readGifts();
-      const entry = gifts.find(other => other.id === gift.id);
-      if (!entry) return;
+      const index = gifts.findIndex(other => other.id === gift.id);
+      if (index < 0) return;
+      const entry = gifts[index];
       entry.favorite = !entry.favorite;
-      await persist(gifts, false);
-      if (!item.isConnected) {
-        refresh();
-        return;
+      const moveToFirst = entry.favorite && index > 0;
+      if (moveToFirst) {
+        gifts.splice(index, 1);
+        gifts.unshift(entry);
       }
-      update(entry.favorite);
-      if (entry.favorite && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        star.animate([
+      const promoteRemaining = !entry.favorite && gifts.slice(index + 1).some(other => other.favorite);
+      if (promoteRemaining) {
+        gifts.sort((a, b) => Number(b.favorite === true) - Number(a.favorite === true));
+      }
+      const reordered = moveToFirst || promoteRemaining;
+      await persist(gifts, false);
+      const animate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let activeStar = star;
+      if (!ordering || reordered || !item.isConnected) {
+        const previousPositions = animate && (reordered || !ordering)
+          ? captureGiftPositions()
+          : null;
+        const restoreFocus = document.activeElement === button;
+        refresh();
+        if (previousPositions) animateGiftPositions(previousPositions);
+        const activeCard = Array.from(list.children).find(card => card.dataset.giftId === entry.id);
+        const activeButton = activeCard?.querySelector('.favorite-button');
+        if (restoreFocus) activeButton?.focus({ preventScroll: true });
+        activeStar = activeButton?.querySelector('.favorite-star');
+      } else {
+        update(entry.favorite);
+      }
+      if (animate && entry.favorite && activeStar) {
+        activeStar.animate([
           { transform: 'rotate(0deg) scale(1)' },
           { transform: 'rotate(-25deg) scale(1.2)' },
           { transform: 'rotate(21deg) scale(1.2)' },
@@ -376,11 +405,27 @@ function favoriteControl(item, gift) {
   return button;
 }
 
+function orderForDisplay(gifts) {
+  if (ordering) return gifts;
+  const direction = { default: 0, "price-asc": 1, "price-desc": -1 }[giftSort.value] ?? 0;
+  return [...gifts].sort((a, b) =>
+    Number(b.favorite === true) - Number(a.favorite === true) || direction * (a.cents - b.cents)
+  );
+}
+
+giftSort.addEventListener('change', () => {
+  const previousPositions = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ? null
+    : captureGiftPositions();
+  refresh();
+  if (previousPositions) animateGiftPositions(previousPositions);
+});
+
 function render(gifts) {
   document.querySelector('#count').textContent = gifts.length === 1 ? '1 regalo' : `${gifts.length} regalos`;
   document.querySelector('#empty').hidden = gifts.length > 0;
   const showOrderControls = ordering && gifts.length > 1;
-  list.replaceChildren(...gifts.map((gift, index) => {
+  list.replaceChildren(...orderForDisplay(gifts).map((gift, index) => {
     const item = element('li', '', 'gift');
     item.dataset.giftId = gift.id;
     const main = element('div', '', 'gift-main');
@@ -394,26 +439,44 @@ function render(gifts) {
       main.append(image);
     }
     const details = element('div', '', 'gift-details');
-    details.append(element('h3', gift.name));
-    if (gift.description) details.append(element('p', gift.description, 'description'));
-    main.append(details);
-    const footer = element('div', '', 'gift-footer');
-    const actions = element('div', '', 'actions');
-    const product = element('a', 'Ver producto', 'product');
+    const product = element('a', gift.name, 'gift-link');
     product.href = webUrl(gift.link);
     product.target = '_blank';
     product.rel = 'noopener noreferrer';
-    actions.append(product);
+    const heading = element('h3', '');
+    heading.append(product);
+    details.append(heading);
+    if (gift.description) details.append(element('p', gift.description, 'description'));
+    main.append(details);
+    const footer = element('div', '', 'gift-footer');
     if (ordering) {
+      const actions = element('div', '', 'actions');
       actions.append(action('Editar', () => editGift(gift)), action('Eliminar', () => removeGift(gift)));
+      footer.append(actions);
+    } else {
+      const hint = element('span', 'Ver producto', 'gift-link-hint');
+      hint.setAttribute('aria-hidden', 'true');
+      footer.append(hint);
     }
-    footer.append(actions);
     footer.append(element('span', euros.format(gift.cents / 100), 'price'), favoriteControl(item, gift));
     item.append(main, footer);
     if (showOrderControls) item.append(orderControls(item, gift, index, gifts.length));
     return item;
   }));
 }
+
+document.addEventListener('click', event => {
+  const previewed = list.querySelector('.gift.is-touch-preview');
+  const product = event.target.closest('.gift-link');
+  const isTouch = event.pointerType === 'touch' ||
+    (!event.pointerType && event.detail > 0 && window.matchMedia('(hover: none) and (pointer: coarse)').matches);
+  previewed?.classList.remove('is-touch-preview');
+  if (!product || !isTouch) return;
+  const card = product.closest('.gift');
+  if (card === previewed) return;
+  event.preventDefault();
+  card.classList.add('is-touch-preview');
+});
 
 function updateBanner(text) {
   bannerDescription.textContent = text;
@@ -422,6 +485,7 @@ function updateBanner(text) {
 
 orderToggle.addEventListener('click', () => {
   ordering = !ordering;
+  giftSort.disabled = ordering;
   orderToggle.setAttribute('aria-pressed', String(ordering));
   bannerForm.hidden = !ordering;
   bannerText.value = bannerDescription.textContent;

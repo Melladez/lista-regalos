@@ -1,11 +1,155 @@
 [
   {
-    "id": "0fff44ba-51ff-4eab-8f64-9809d35c8f90",
-    "name": "Prueba regalo",
+    "id": "b68d39fe-b122-4aa2-9d31-09af52ecf9d7",
+    "name": "ProCase Soporte de Reloj",
+    "description": "Para poner los relojes y las llaves y no tenerlo tirados por la mesa/estanteria",
+    "link": "https://www.amazon.es/gp/product/B0DKSNJ3V1/ref=ewc_pr_img_1?smid=A1C840BXGA8BVI",
+    "cents": 2599,
+    "image": "https://m.media-amazon.com/images/I/81ZIfhnlwBL.jpg",
+    "favorite": true
+  },
+  {
+    "id": "b003ad81-dc9d-4ffb-aa79-e5d46a3af71e",
+    "name": "The Legend of Zelda Ocarina of Time",
+    "description": "Quizas se puede encontrar mas barato en otras tiendas (Carrefour, Game, Fnac...)",
+    "link": "https://www.amazon.es/leyenda-Zelda-Ocarina-del-tiempo/dp/B0HJ8K5MDK/ref=sr_1_2?sr=8-2",
+    "cents": 7236,
+    "image": "https://m.media-amazon.com/images/I/81AWZN0TCRL._AC_UF1000,1000_QL80_.jpg",
+    "favorite": true
+  },
+  {
+    "id": "51803e0b-bd8f-4d51-b77e-7a4c01b11f8e",
+    "name": "Funda tablet 360",
+    "description": "Funda para poner tanto en vertical como horizontal.\nLa mia es solo horizontal y para leer es muy incomoda a veces",
+    "link": "https://www.amazon.es/idudao-Pulgadas-Giratoria-Encendido-Autom%C3%A1tico/dp/B0G19W9C4F/ref=sr_1_21?__mk_es_ES=%C3%85M%C3%85%C5%BD%C3%95%C3%91&sr=8-21",
+    "cents": 1149,
+    "image": "https://m.media-amazon.com/images/W/BW_MEDIAX_AVIF_MEASUREMENT_1306696-T4/images/I/61iBLy9KGTL._AC_SL1500_.jpg",
+    "favorite": true
+  },
+  {
+    "id": "15584208-1d11-488e-b5d6-6212f59db5f6",
+    "name": "Papelera",
+    "description": "Ya es hora de tener una papelera normal",
+    "link": "https://www.amazon.es/TECHZOCO-Papelera-Metalica-met%C3%A1lico-Escritorio/dp/B0DHGR7HCH/ref=sr_1_6?sr=8-6",
+    "cents": 899,
+    "image": "https://m.media-amazon.com/images/W/BW_MEDIAX_AVIF_MEASUREMENT_1306696-T4/images/I/81yckur-iIL._SL1500_.jpg",
+    "favorite": false
+  },
+  {
+    "id": "e9d73583-38d2-4670-9f69-a6f60671e967",
+    "name": "HyperX Cloud Alpha Wireless 2",
+    "description": "En el remoto caso de que esto se compre NO COMPRAR streamDeck, estos cascos ya incluyen uno",
+    "link": "https://www.amazon.es/HyperX-Cloud-Alpha-Wireless-inal%C3%A1mbricos/dp/B0FJXLBWWT",
+    "cents": 21500,
+    "image": "https://m.media-amazon.com/images/W/BW_MEDIAX_AVIF_MEASUREMENT_1306696-T4/images/I/71+3Y-wGrcL._AC_SL1500_.jpg",
+    "favorite": false
+  },
+  {
+    "id": "73482f0d-fcc5-48fc-9b87-cc1709bdb828",
+    "name": "Danza de dragones (5º libro)",
     "description": "",
-    "link": "https://www.amazon.es/BLUETTI-Elite-200-V2-Generador/dp/B0DRFZ8C31?pd_rd_w=NwxW6&content-id=amzn1.sym.b76d0d5c-7e9d-4a51-9266-2ab94919ffd0&pf_rd_p=b76d0d5c-7e9d-4a51-9266-2ab94919ffd0&pf_rd_r=V8EZ07J5ZGBQXNR5A84A&pd_rd_wg=xiPn7&pd_rd_r=71132586-e512-447a-85e7-9ce5b882e274&pd_rd_i=B0DRFZ8C31&th=1",
-    "cents": 900000,
-    "image": "",
+    "link": "https://www.amazon.es/Danza-dragones-Canci%C3%B3n-hielo-fuego/dp/8401032466/ref=sr_1_9?__mk_es_ES=%C3%85M%C3%85%C5%BD%C3%95%C3%91&sr=8-9",
+    "cents": 2840,
+    "image": "https://m.media-amazon.com/images/W/BW_MEDIAX_AVIF_MEASUREMENT_1306696-T4/images/I/91ykG3knsEL._SL1500_.jpg",
+    "favorite": false
+  },
+  {
+    "id": "05602bcd-cf16-4e96-9e1f-cdc79c234db7",
+    "name": "Festín de cuervos (4º libro)",
+    "description": "",
+    "link": "https://www.amazon.es/Fest%C3%ADn-cuervos-Canci%C3%B3n-hielo-fuego/dp/8401032458/ref=sr_1_7?__mk_es_ES=%C3%85M%C3%85%C5%BD%C3%95%C3%91&sr=8-7",
+    "cents": 2745,
+    "image": "https://m.media-amazon.com/images/W/BW_MEDIAX_AVIF_MEASUREMENT_1306696-T4/images/I/91quuGpKYUL._SL1500_.jpg",
+    "favorite": false
+  },
+  {
+    "id": "bff7654e-655e-41dc-825e-d89c7a1e2ac4",
+    "name": "Tormenta de espadas (3º libro)",
+    "description": "",
+    "link": "https://www.amazon.es/Tormenta-espadas-Canci%C3%B3n-hielo-fuego/dp/8466374957/ref=sr_1_5?__mk_es_ES=%C3%85M%C3%85%C5%BD%C3%95%C3%91&sr=8-5",
+    "cents": 2840,
+    "image": "https://m.media-amazon.com/images/W/BW_MEDIAX_AVIF_MEASUREMENT_1306696-T4/images/I/91UQbSelR9L._SL1500_.jpg",
+    "favorite": false
+  },
+  {
+    "id": "6611bf0e-6fb6-4bda-a21c-729fb871cd9d",
+    "name": "Choque de reyes (2º libro GoT)",
+    "description": "",
+    "link": "https://www.amazon.es/Choque-reyes-Canci%C3%B3n-hielo-fuego/dp/8401032431/ref=sr_1_2?__mk_es_ES=%C3%85M%C3%85%C5%BD%C3%95%C3%91&sr=8-2",
+    "cents": 2745,
+    "image": "https://m.media-amazon.com/images/W/BW_MEDIAX_AVIF_MEASUREMENT_1306696-T4/images/I/91CVf1zD2qL._SL1500_.jpg",
+    "favorite": false
+  },
+  {
+    "id": "31642a7c-ab40-4d28-a733-e9954e25b18f",
+    "name": "Cargador para Wii U Gamepad 4.75V 1.6A Fuente de Alimentación Adaptador",
+    "description": "Comprar con el cargador de fuente de alimentacion",
+    "link": "https://www.amazon.es/dp/B0H1C8QMTT",
+    "cents": 949,
+    "image": "https://m.media-amazon.com/images/W/BW_MEDIAX_AVIF_MEASUREMENT_1306696-T4/images/I/51pcYYdykVL._AC_SL1500_.jpg",
+    "favorite": false
+  },
+  {
+    "id": "cf9376d3-2b89-4844-b982-9606d541f04a",
+    "name": "Link-e - Cargador de Fuente de Alimentacion Compatible con la Consola Nintendo Wii-U",
+    "description": "Comprar con el cargador del mando",
+    "link": "https://www.amazon.es/dp/B07MZ2PT2N",
+    "cents": 2490,
+    "image": "https://m.media-amazon.com/images/W/BW_MEDIAX_AVIF_MEASUREMENT_1306696-T4/images/I/51rAD4zMOkL._AC_SL1000_.jpg",
+    "favorite": false
+  },
+  {
+    "id": "759000c3-4b5c-442c-9725-f7402bf43a34",
+    "name": "StreamDeck",
+    "description": "Un coso para controlar diferentes aplicaciones a eleccion",
+    "link": "https://www.amazon.es/Elgato-controlador-estudio-acciones-funciona/dp/B09738CV2G/ref=sr_1_6?__mk_es_ES=%C3%85M%C3%85%C5%BD%C3%95%C3%91&sr=8-6",
+    "cents": 11305,
+    "image": "https://m.media-amazon.com/images/W/BW_MEDIAX_AVIF_MEASUREMENT_1306696-T4/images/I/61kmUcPNlBL._AC_SL1500_.jpg",
+    "favorite": false
+  },
+  {
+    "id": "6218ff04-f20b-4a9e-99da-2b3fbe9cf8c8",
+    "name": "LEGO Halcón Milenario",
+    "description": "El enlace es una oferta, si no esta a ese precio, preguntarme\nEl lego es una version \"pirata\" por si no parece muy fiable",
+    "link": "https://es.aliexpress.com/item/1005013607329440.html?srcSns=sns_Copy&businessType=ProductDetail&spreadType=socialShare&aff_fcid=b0a23a0359c7412784df20c64ef55fb1-1795364034248-08727-_EG2KsQK&tt=CPS_NORMAL&aff_fsk=_EG2KsQK&aff_platform=shareComponent-detail&sk=_EG2KsQK&aff_trace_key=b0a23a0359c7412784df20c64ef55fb1-1795364034248-08727-_EG2KsQK&terminal_id=92b67b3c25a341e7bcad63daf914ccc3&afSmartRedirect=y",
+    "cents": 14339,
+    "image": "https://www.quedejuguetes.com/84063-thickbox_default/halcon-milenario.jpg",
+    "favorite": false
+  },
+  {
+    "id": "5f51b9ad-dbab-4975-a80e-90cf50de0b68",
+    "name": "Red Rising (edición especial)",
+    "description": "",
+    "link": "https://www.amazon.es/Red-Rising-Deluxe-Slipcase/dp/0593871529/ref=sr_1_1?sr=8-1",
+    "cents": 4000,
+    "image": "https://m.media-amazon.com/images/W/BW_MEDIAX_AVIF_MEASUREMENT_1306696-T4/images/I/71PjsD8iHwL._SL1500_.jpg",
+    "favorite": false
+  },
+  {
+    "id": "18a0f72d-062d-42ef-a16e-6d5c54f6f9a4",
+    "name": "Dios Emperador de Dune (4º libro)",
+    "description": "Comprar en pack con los otros 2 a poder ser",
+    "link": "https://www.amazon.es/emperador-edici%C3%B3n-cr%C3%B3nicas-Seller-Ficci%C3%B3n/dp/8466393927/ref=sr_1_1?__mk_es_ES=%C3%85M%C3%85%C5%BD%C3%95%C3%91&s=books&sr=1-1",
+    "cents": 2085,
+    "image": "https://www.penguinlibros.com/es/8274856-medium_default/dios-emperador-de-dune-edicion-de-lujo-las-cronicas-de-dune-4.jpg",
+    "favorite": false
+  },
+  {
+    "id": "fa60339c-f4dd-4bf4-9ba7-6055afb78952",
+    "name": "Herejes de Dune (5º libro)",
+    "description": "Comprar en pack con los otros 2 a poder ser",
+    "link": "https://www.amazon.es/Herejes-edici%C3%B3n-cr%C3%B3nicas-Seller-Ficci%C3%B3n/dp/8466393951/ref=sr_1_9?s=books&sr=1-9",
+    "cents": 2085,
+    "image": "https://www.penguinlibros.com/es/8274858-medium_default/herejes-de-dune-edicion-de-lujo-las-cronicas-de-dune-5.jpg",
+    "favorite": false
+  },
+  {
+    "id": "3669b172-71e2-4596-bfbc-081fafc3c574",
+    "name": "Casa Capitular: Dune (6º libro)",
+    "description": "Comprar en pack con los otros 2 a poder ser",
+    "link": "https://www.amazon.es/Casa-Capitular-edici%C3%B3n-cr%C3%B3nicas-Ficci%C3%B3n/dp/846639396X/ref=pd_bxgy_d_sccl_1/520-4609166-7287100?psc=1",
+    "cents": 2085,
+    "image": "https://www.penguinlibros.com/es/8278764-large_default/casa-capitular-dune-edicion-de-lujo-las-cronicas-de-dune-6.webp",
     "favorite": false
   }
 ]
