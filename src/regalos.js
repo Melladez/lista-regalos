@@ -339,6 +339,37 @@ function orderControls(item, gift, index, count) {
   return controls;
 }
 
+const publicFavoritesKey = 'mi-lista-de-regalos-favoritos-publicos';
+let publicFavorites = new Map();
+
+function setGiftFavorite(gifts, index, favorite) {
+  const entry = gifts[index];
+  entry.favorite = favorite;
+  if (favorite && index > 0) {
+    gifts.splice(index, 1);
+    gifts.unshift(entry);
+    return true;
+  }
+  if (!favorite && gifts.slice(index + 1).some(other => other.favorite)) {
+    gifts.sort((a, b) => Number(b.favorite === true) - Number(a.favorite === true));
+    return true;
+  }
+  return false;
+}
+
+function loadPublicFavorites() {
+  try {
+    publicFavorites = new Map(JSON.parse(localStorage.getItem(publicFavoritesKey) ?? '[]'));
+  } catch {
+    return;
+  }
+  for (const [id, favorite] of publicFavorites) {
+    if (typeof favorite !== 'boolean') continue;
+    const index = savedGifts.findIndex(gift => gift.id === id);
+    if (index >= 0) setGiftFavorite(savedGifts, index, favorite);
+  }
+}
+
 function favoriteControl(item, gift) {
   const star = element('span', '', 'favorite-star');
   star.setAttribute('aria-hidden', 'true');
@@ -348,18 +379,19 @@ function favoriteControl(item, gift) {
       const index = gifts.findIndex(other => other.id === gift.id);
       if (index < 0) return;
       const entry = gifts[index];
-      entry.favorite = !entry.favorite;
-      const moveToFirst = entry.favorite && index > 0;
-      if (moveToFirst) {
-        gifts.splice(index, 1);
-        gifts.unshift(entry);
+      const reordered = setGiftFavorite(gifts, index, !entry.favorite);
+      if (writable) {
+        await persist(gifts, false);
+      } else {
+        savedGifts = gifts;
+        publicFavorites.delete(entry.id);
+        publicFavorites.set(entry.id, entry.favorite);
+        try {
+          localStorage.setItem(publicFavoritesKey, JSON.stringify([...publicFavorites]));
+        } catch {
+          status.textContent = 'El favorito se mantendrá hasta que cierres o recargues la página.';
+        }
       }
-      const promoteRemaining = !entry.favorite && gifts.slice(index + 1).some(other => other.favorite);
-      if (promoteRemaining) {
-        gifts.sort((a, b) => Number(b.favorite === true) - Number(a.favorite === true));
-      }
-      const reordered = moveToFirst || promoteRemaining;
-      await persist(gifts, false);
       const animate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       let activeStar = star;
       if (!ordering || reordered || !item.isConnected) {
@@ -390,7 +422,6 @@ function favoriteControl(item, gift) {
     }
   });
   button.className = 'favorite-button';
-  button.disabled = !writable;
   button.setAttribute('aria-label', `Favorito: ${gift.name}`);
   button.append(star);
 
@@ -678,6 +709,7 @@ async function loadGifts() {
     savedGifts = validateBackup({ version: 1, gifts, banner: null }).gifts;
     revision = response.headers.get('ETag');
     writable = Boolean(revision) && response.headers.get('X-Regalos-Editable') === 'true';
+    if (!writable) loadPublicFavorites();
     refresh();
     exportButton.disabled = false;
     orderToggle.hidden = toggle.hidden = importButton.hidden = !writable;
