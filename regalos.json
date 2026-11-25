@@ -1,5 +1,32 @@
 [
   {
+    "id": "fb110a40-d919-49d9-9ea6-7e056b8cf1ef",
+    "name": "ATAQUE A LOS TITANES ED. INTEGRAL 02",
+    "description": "",
+    "link": "https://www.amazon.es/ATAQUE-LOS-TITANES-ED-INTEGRAL/dp/8467964154/ref=sr_1_5?__mk_es_ES=%C3%85M%C3%85%C5%BD%C3%95%C3%91&sr=8-5",
+    "cents": 2327,
+    "image": "https://m.media-amazon.com/images/W/BW_MEDIAX_AVIF_MEASUREMENT_1306696-T4/images/I/61rGDdHul5L._SL1200_.jpg",
+    "favorite": false
+  },
+  {
+    "id": "4b9e2ee8-dc9d-4f5a-ace9-471685bcdf71",
+    "name": "MARVEL: Lobezno",
+    "description": "",
+    "link": "https://www.game.es/marvel-lobezno-ps5/253892",
+    "cents": 5995,
+    "image": "https://media.game.es/COVERV2/3D_L/253/253892.png",
+    "favorite": false
+  },
+  {
+    "id": "7177eb4a-f65f-48e4-b84b-fdcf6625d469",
+    "name": "Leyendas Pokémon Z-A",
+    "description": "Tiene que ser la version de switch 2",
+    "link": "https://www.game.es/leyendas-pokemon-z-a-nsw2-edition-nintendo-switch-2/246605",
+    "cents": 5999,
+    "image": "https://media.game.es/COVERV2/3D_L/246/246605.png",
+    "favorite": false
+  },
+  {
     "id": "b68d39fe-b122-4aa2-9d31-09af52ecf9d7",
     "name": "ProCase Soporte de Reloj",
     "description": "Para poner los relojes y las llaves y no tenerlo tirados por la mesa/estanteria",
