@@ -682,3 +682,39 @@ button:disabled { opacity: .47; cursor: default; }
   .appearance-switch, .appearance-track, .appearance-track::after { transition: none; }
 }
 */
+
+.theme-picker { position: relative; }
+.theme-picker summary { padding: 11px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--pine); font-weight: 700; cursor: pointer; }
+.theme-options { position: absolute; z-index: 4; inset: calc(100% + 6px) 0 auto auto; min-width: 160px; margin: 0; padding: 8px 12px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); box-shadow: 0 8px 20px #4e2b1420; }
+.theme-options legend { background: var(--paper); font-size: .875rem; }
+.theme-options label { display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; }
+.theme-options input { width: auto; accent-color: var(--wine); }
+/* Keep the dropdown inside the toolbar on narrow screens. */
+@media (max-width: 520px) { .theme-options { position: static; margin-top: 6px; } }
+
+.birthday-art { display: none; }
+:root[data-birthday-theme] {
+  --ink: #281940;
+  --muted: #5b4b72;
+  --paper: #fffaff;
+  --line: #e2cce9;
+  --wine: #6332a1;
+  --pine: #583084;
+  --gold: #ffd986;
+  background: #f5eefa;
+}
+[data-birthday-theme] body { background: radial-gradient(ellipse at 48% 0, #fff7f0, transparent 68%); }
+[data-birthday-theme] .hero { background: radial-gradient(ellipse at 84% 16%, #a84981, transparent 58%), linear-gradient(130deg, #33194e, #65328a); }
+[data-birthday-theme] .hero::after {
+  opacity: .72;
+  background: radial-gradient(circle, #ffd986 2px, transparent 3px) 3px 8px / 41px 37px,
+    radial-gradient(circle, #ef91b8 2px, transparent 3px) 14px 9px / 53px 47px,
+    radial-gradient(circle, #c3acf7 1.5px, transparent 2.5px) 9px 21px / 33px 43px;
+}
+[data-birthday-theme] .hero h1 { font-size: min(8.5cqi, 6rem); }
+[data-birthday-theme] .ornament, [data-birthday-theme] .present, [data-birthday-theme] .snowfall { display: none; }
+[data-birthday-theme] .birthday-art { display: block; position: absolute; inset: 0; }
+.birthday-art i { position: absolute; top: 17%; left: 27%; width: 27%; aspect-ratio: 4 / 5; border-radius: 50%; background: radial-gradient(circle at 30% 24%, #ffe4f1, #db5c96 65%); box-shadow: inset -7px -9px 16px #36184135; transform: rotate(-16deg); }
+.birthday-art i::after { content: ""; position: absolute; top: 98%; left: 50%; width: 22%; height: 43%; border-left: 1px solid #fff5e5; border-radius: 45%; }
+.birthday-art i:nth-child(2) { top: 3%; left: 53%; background: radial-gradient(circle at 30% 24%, #fff5cc, #e7a742 72%); transform: rotate(14deg); }
+.birthday-art i:nth-child(3) { top: 48%; left: 51%; width: 22%; background: radial-gradient(circle at 30% 24%, #ebddff, #9a70e1 68%); transform: rotate(8deg); }

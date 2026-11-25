@@ -21,7 +21,7 @@
     -->
     <section class="hero" aria-labelledby="titulo">
       <div class="hero-copy">
-        <h1 id="titulo">Mi lista de <em>Navidad</em></h1>
+        <h1 id="titulo">Mi lista de <em id="occasion-title">Navidad</em></h1>
         <p id="banner-description" class="hero-description">En el remoto (muy remoto) caso de que se regale algo caro me da igual que sea lo unico que me llevo estas navidades :)</p>
         <form id="banner-form" class="banner-form" hidden>
           <label for="banner-text">Descripción del banner</label>
@@ -36,6 +36,7 @@
         <span class="ornament ornament-gold"></span>
         <span class="ornament ornament-green"></span>
         <div class="present"><i></i><b></b><span>✧</span><small>✦</small></div>
+        <div class="birthday-art"><i></i><i></i><i></i></div>
       </div>
     </section>
     <div class="toolbar">
@@ -55,6 +56,14 @@
           <option value="price-asc">Precio: menor a mayor</option>
         </select>
       </label>
+      <details id="theme-picker" class="theme-picker" hidden>
+        <summary>Estilos</summary>
+        <fieldset class="theme-options">
+          <legend>Estilo de la lista</legend>
+          <label><input type="radio" name="occasion" value="christmas" checked> Navidad</label>
+          <label><input type="radio" name="occasion" value="birthday"> Cumpleaños</label>
+        </fieldset>
+      </details>
       <div class="toolbar-actions">
         <details class="transfer">
           <summary>Trasladar lista</summary>

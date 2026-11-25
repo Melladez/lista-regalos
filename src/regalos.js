@@ -28,7 +28,10 @@ appearanceSwitch.addEventListener('click', () => {
 });
 */
 
-const bannerKey = 'mi-lista-de-regalos-descripcion';
+const themeKey = 'mi-lista-de-regalos-ocasion';
+const themePicker = document.querySelector('#theme-picker');
+let birthdayTheme = false;
+const bannerKey = () => 'mi-lista-de-regalos-descripcion' + (birthdayTheme ? '-cumpleanos' : '');
 const bannerDescription = document.querySelector('#banner-description');
 const defaultBannerDescription = bannerDescription.textContent;
 const bannerForm = document.querySelector('#banner-form');
@@ -167,7 +170,7 @@ exportButton.addEventListener('click', () => {
     const backup = {
       version: 1,
       gifts: readGifts(),
-      banner: writable ? localStorage.getItem(bannerKey) : null
+      banner: writable ? localStorage.getItem(bannerKey()) : null
     };
     const url = URL.createObjectURL(new Blob([JSON.stringify(backup)], { type: 'application/json' }));
     const download = document.createElement('a');
@@ -198,15 +201,16 @@ importFile.addEventListener('change', async () => {
     const current = readGifts();
     const currentIds = new Set(current.map(gift => gift.id));
     const additions = backup.gifts.filter(gift => !currentIds.has(gift.id));
-    const restoreBanner = backup.banner !== null && localStorage.getItem(bannerKey) === null;
-    if (restoreBanner) localStorage.setItem(bannerKey, backup.banner);
+    const importedBannerKey = bannerKey();
+    const restoreBanner = backup.banner !== null && localStorage.getItem(importedBannerKey) === null;
+    if (restoreBanner) localStorage.setItem(importedBannerKey, backup.banner);
     try {
       if (additions.length) await persist([...current, ...additions]);
     } catch (error) {
-      if (restoreBanner) localStorage.removeItem(bannerKey);
+      if (restoreBanner) localStorage.removeItem(importedBannerKey);
       throw error;
     }
-    if (restoreBanner) {
+    if (restoreBanner && importedBannerKey === bannerKey()) {
       updateBanner(backup.banner);
       bannerText.value = backup.banner;
     }
@@ -514,9 +518,34 @@ function updateBanner(text) {
   bannerDescription.hidden = ordering || !text;
 }
 
+function themeDescription() {
+  return birthdayTheme ? 'Guarda los regalos que te haría ilusión recibir en tu cumpleaños.' : defaultBannerDescription;
+}
+
+function applyTheme(theme) {
+  birthdayTheme = theme === 'birthday';
+  document.documentElement.toggleAttribute('data-birthday-theme', birthdayTheme);
+  document.querySelector('#occasion-title').textContent = birthdayTheme ? 'cumpleaños' : 'Navidad';
+  themePicker.querySelector(birthdayTheme ? '[value="birthday"]' : '[value="christmas"]').checked = true;
+  let description = themeDescription();
+  try { description = localStorage.getItem(bannerKey()) ?? description; } catch {}
+  updateBanner(description);
+  bannerText.value = description;
+  bannerStatus.textContent = '';
+}
+
+themePicker.addEventListener('change', event => {
+  applyTheme(event.target.value);
+  try { localStorage.setItem(themeKey, event.target.value); } catch {}
+  themePicker.open = false;
+  themePicker.querySelector('summary').focus();
+});
+
 orderToggle.addEventListener('click', () => {
   ordering = !ordering;
   giftSort.disabled = ordering;
+  themePicker.hidden = !ordering;
+  if (!ordering) themePicker.open = false;
   orderToggle.setAttribute('aria-pressed', String(ordering));
   bannerForm.hidden = !ordering;
   bannerText.value = bannerDescription.textContent;
@@ -530,7 +559,7 @@ bannerForm.addEventListener('submit', event => {
   event.preventDefault();
   const text = bannerText.value.trim();
   try {
-    localStorage.setItem(bannerKey, text);
+    localStorage.setItem(bannerKey(), text);
     updateBanner(text);
     bannerText.value = text;
     bannerStatus.textContent = 'Descripción guardada.';
@@ -715,12 +744,13 @@ async function loadGifts() {
     orderToggle.hidden = toggle.hidden = importButton.hidden = !writable;
     if (writable) {
       try {
-        updateBanner(localStorage.getItem(bannerKey) ?? defaultBannerDescription);
+        applyTheme(localStorage.getItem(themeKey));
       } catch {
-        updateBanner(defaultBannerDescription);
+        applyTheme(null);
       }
       window.addEventListener('storage', event => {
-        if (event.key === bannerKey || event.key === null) updateBanner(event.newValue ?? defaultBannerDescription);
+        if (event.key === themeKey || event.key === null) applyTheme(event.newValue);
+        if (event.key === bannerKey()) updateBanner(event.newValue ?? themeDescription());
       });
     } else {
       document.querySelector('#empty h3').textContent = 'Todavía no hay regalos';
