@@ -1,5 +1,32 @@
 [
   {
+    "id": "b4050410-1311-4c0e-bb45-af92f47c7905",
+    "name": "Leyendas Pokémon Z-A",
+    "description": "Tiene que ser la version de Switch 2",
+    "link": "https://www.game.es/leyendas-pokemon-z-a-nsw2-edition-nintendo-switch-2/246605",
+    "cents": 5999,
+    "image": "https://media.game.es/COVERV2/3D_L/246/246605.png",
+    "favorite": false
+  },
+  {
+    "id": "f816fa84-14ac-4fa8-bbe4-47c0bc4aab9d",
+    "name": "Marvel: Lobezno",
+    "description": "",
+    "link": "https://www.game.es/marvel-lobezno-ps5/253892",
+    "cents": 5995,
+    "image": "https://media.game.es/COVERV2/3D_L/253/253892.png",
+    "favorite": false
+  },
+  {
+    "id": "4f05fe3e-23e2-4bed-889d-52cc2fa0268c",
+    "name": "ATAQUE A LOS TITANES (2º libro)",
+    "description": "",
+    "link": "https://www.amazon.es/ATAQUE-LOS-TITANES-ED-INTEGRAL/dp/8467964154/ref=sr_1_5?__mk_es_ES=%C3%85M%C3%85%C5%BD%C3%95%C3%91&sr=8-5",
+    "cents": 2327,
+    "image": "https://m.media-amazon.com/images/W/BW_MEDIAX_AVIF_MEASUREMENT_1306696-T4/images/I/61rGDdHul5L._SL1200_.jpg",
+    "favorite": false
+  },
+  {
     "id": "b68d39fe-b122-4aa2-9d31-09af52ecf9d7",
     "name": "ProCase Soporte de Reloj",
     "description": "Para poner los relojes y las llaves y no tenerlo tirados por la mesa/estanteria",
@@ -81,27 +108,9 @@
     "favorite": false
   },
   {
-    "id": "31642a7c-ab40-4d28-a733-e9954e25b18f",
-    "name": "Cargador para Wii U Gamepad 4.75V 1.6A Fuente de Alimentación Adaptador",
-    "description": "Comprar con el cargador de fuente de alimentacion",
-    "link": "https://www.amazon.es/dp/B0H1C8QMTT",
-    "cents": 949,
-    "image": "https://m.media-amazon.com/images/W/BW_MEDIAX_AVIF_MEASUREMENT_1306696-T4/images/I/51pcYYdykVL._AC_SL1500_.jpg",
-    "favorite": false
-  },
-  {
-    "id": "cf9376d3-2b89-4844-b982-9606d541f04a",
-    "name": "Link-e - Cargador de Fuente de Alimentacion Compatible con la Consola Nintendo Wii-U",
-    "description": "Comprar con el cargador del mando",
-    "link": "https://www.amazon.es/dp/B07MZ2PT2N",
-    "cents": 2490,
-    "image": "https://m.media-amazon.com/images/W/BW_MEDIAX_AVIF_MEASUREMENT_1306696-T4/images/I/51rAD4zMOkL._AC_SL1000_.jpg",
-    "favorite": false
-  },
-  {
     "id": "759000c3-4b5c-442c-9725-f7402bf43a34",
     "name": "StreamDeck",
-    "description": "Un coso para controlar diferentes aplicaciones a eleccion",
+    "description": "Un coso para controlar diferentes aplicaciones a eleccion en mi ordenador",
     "link": "https://www.amazon.es/Elgato-controlador-estudio-acciones-funciona/dp/B09738CV2G/ref=sr_1_6?__mk_es_ES=%C3%85M%C3%85%C5%BD%C3%95%C3%91&sr=8-6",
     "cents": 11305,
     "image": "https://m.media-amazon.com/images/W/BW_MEDIAX_AVIF_MEASUREMENT_1306696-T4/images/I/61kmUcPNlBL._AC_SL1500_.jpg",
